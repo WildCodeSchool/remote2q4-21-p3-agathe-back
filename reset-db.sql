@@ -5,7 +5,7 @@
 -- Modify this code to update the DB schema diagram.
 -- To reset the sample schema, replace everything with
 -- two dots ('..' - without quotes).
-ALTER TABLe `Order` DROP FOREIGN KEY fk_Order_UserID;
+ALTER TABLE `Order` DROP FOREIGN KEY fk_Order_UserID;
 ALTER TABLE `Order` DROP FOREIGN KEY fk_Order_OrderStatusID;
 ALTER TABLE OrderLine DROP FOREIGN KEY fk_OrderLine_OrderID;
 ALTER TABLE OrderLine DROP FOREIGN KEY fk_OrderLine_ProductID;
@@ -96,7 +96,7 @@ ON User(LastName);
 
 -- PRESENTATION
 INSERT INTO Presentation(presentation)
-values ("Elfen a été imaginée en Bretagne sud, à la croisée des éléments naturels.\nElle est née de l'intérêt de Pierre pour les huiles végétales et de la volonté de sa fille, Agathe, de vous faire découvrir la caméline et ses innombrables vertus au travers de soins adaptés pour tous.\n\nNos huiles y sont fabriquées artisenalement pour sublimer tous leurs bienfaits.\nLeur composition est à 100% d'origine naturelle, les ingrédients à 98% d'origine bretonne et les flacons sont en verre, zéro-déchet.");
+values ("Elfenn a été imaginée en Bretagne sud, à la croisée des éléments naturels.\nElle est née de l'intérêt de Pierre pour les huiles végétales et de la volonté de sa fille, Agathe, de vous faire découvrir la caméline et ses innombrables vertus au travers de soins adaptés pour tous.\n\nNos huiles y sont fabriquées artisanalement pour sublimer tous leurs bienfaits.\nLeur composition est à 100% d'origine naturelle, les ingrédients à 98% d'origine bretonne et les flacons sont en verre, zéro-déchet.");
 
 -- insert des 4 articles de base
 INSERT INTO Product (Name, Price, Characteristic, Description, Ingredient)

@@ -13,7 +13,7 @@ presentationRouter.get('/', (req, res) => {
     });
 });
 
-router.put('/', (req, res) => {
+presentationRouter.put('/', (req, res) => {
   Presentation.update(req.body)
     .then(() => {
       res.status(200).json({

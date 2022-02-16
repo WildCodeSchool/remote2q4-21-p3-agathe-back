@@ -5,7 +5,9 @@ presentationRouter.get('/', (req, res) => {
   Presentation.findOne()
     .then((presentation) => {
       if (presentation) res.json(presentation);
-      else res.status(404).send('Presentation not found');
+      else {
+        res.status(404).send('Presentation not found');
+      }
     })
     .catch((err) => {
       console.error(err);
@@ -13,7 +15,7 @@ presentationRouter.get('/', (req, res) => {
     });
 });
 
-router.put('/', (req, res) => {
+presentationRouter.put('/', (req, res) => {
   Presentation.update(req.body)
     .then(() => {
       res.status(200).json({

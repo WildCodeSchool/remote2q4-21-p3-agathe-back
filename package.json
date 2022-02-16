@@ -5,8 +5,7 @@
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node app.js",
-    "dev": "nodemon app.js"
+    "start": "nodemon app.js"
   },
   "keywords": [],
   "author": "",
@@ -17,6 +16,7 @@
     "express": "^4.17.1",
     "joi": "^17.6.0",
     "mysql2": "^2.3.0",
-    "nodemon": "^2.0.12"
+    "nodemon": "^2.0.12",
+    "Router": "^2.1.0"
   }
 }

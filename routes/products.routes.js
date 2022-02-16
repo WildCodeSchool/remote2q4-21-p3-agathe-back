@@ -1,4 +1,4 @@
-const router = require("express").Router();
+const productsRouter = require("express").Router();
 const Products = require("../models/products");
 
 

@@ -5,7 +5,9 @@ presentationRouter.get('/', (req, res) => {
   Presentation.findOne()
     .then((presentation) => {
       if (presentation) res.json(presentation);
-      else res.status(404).send('Presentation not found');
+      else {
+        res.status(404).send('Presentation not found');
+      }
     })
     .catch((err) => {
       console.error(err);

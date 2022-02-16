@@ -11,12 +11,12 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "axios": "^0.26.0",
     "cors": "^2.8.5",
     "dotenv": "^10.0.0",
     "express": "^4.17.1",
     "joi": "^17.6.0",
     "mysql2": "^2.3.0",
-    "nodemon": "^2.0.12",
-    "Router": "^2.1.0"
+    "nodemon": "^2.0.15"
   }
 }

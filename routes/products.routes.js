@@ -1,85 +1,84 @@
-const connection = require("../db-config");
 const router = require("express").Router();
+const Products = require("../models/products");
 
-router.get('/', (req, res) => {
-    connection.query('SELECT * FROM users', (err, result) => {
-      if (err) {
-        res.status(500).send('Error retrieving users from database');
-      } else {
-        res.json(result);
-      }
+
+productsRouter.get('/', (req, res) => {
+  // const {  } = req.query;
+  Products.findMany()
+    .then((products) => {
+      res.json(products);
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(500).send('Error retrieving products from database');
     });
-  });
-
-router.get('/:id', (req, res) => {
-  const userId = req.params.id;
-  connection.query(
-    'SELECT * FROM users WHERE id = ?',
-    [userId],
-    (err, results) => {
-      if (err) {
-        res.status(500).send('Error retrieving user from database');
-      } else {
-        if (results.length) res.json(results[0]);
-        else res.status(404).send('User not found');
-      }
-    }
-  );
 });
 
-router.post('/', (req, res) => {
-  const { username, password, email } = req.body;
-  connection.query(
-    'INSERT INTO users (username, password, email) VALUES (?, ?, ?)',
-    [username, password, email],
-    (err, result) => {
-      if (err) {
+productsRouter.get('/:id', (req, res) => {
+  Products.findOne(req.params.id)
+    .then((products) => {
+      if (products) {
+        res.json(products);
+      } else {
+        res.status(404).send('Product not found');
+      }
+    })
+    .catch((err) => {
+      res.status(500).send('Error retrieving product from database');
+    });
+});
+
+productsRouter.post('/', (req, res) => {
+  // const error = Movie.validate(req.body);
+  // if (error) {
+  //   res.status(422).json({ validationErrors: error.details });
+  // } else {
+    Products.create(req.body)
+      .then((createdProducts) => {
+        res.status(201).json(createdProducts);
+      })
+      .catch((err) => {
         console.error(err);
-        res.status(500).send('Error saving the user');
-      } else {
-        const id = result.insertId;
-        const createdUser = { id, username, password, email };
-        res.status(201).json(createdUser);
-      }
-    }
-  );
+        res.status(500).send('Error saving the product');
+      });
+  // }
 });
 
-router.put('/:id', (req, res) => {
-  const userId = req.params.id;
-  const db = connection.promise();
-  let existingUser = null;
-  db.query('SELECT * FROM users WHERE id = ?', [userId])
-    .then(([results]) => {
-      existingUser = results[0];
-      if (!existingUser) return Promise.reject('RECORD_NOT_FOUND');
-      return db.query('UPDATE users SET ? WHERE id = ?', [req.body, userId]);
+productsRouter.put('/:id', (req, res) => {
+  let existingProducts = null;
+  // let validationErrors = null;
+  Products.findOne(req.params.id)
+    .then((products) => {
+      existingProducts = products;
+      if (!existingProducts) return Promise.reject('RECORD_NOT_FOUND');
+      // validationErrors = Movie.validate(req.body, false);
+      // if (validationErrors) return Promise.reject('INVALID_DATA');
+      return Products.update(req.params.id, req.body);
     })
     .then(() => {
-      res.status(200).json({ ...existingUser, ...req.body });
+      res.status(200).json({ ...existingProducts, ...req.body });
     })
     .catch((err) => {
       console.error(err);
       if (err === 'RECORD_NOT_FOUND')
-        res.status(404).send(`User with id ${userId} not found.`);
-      else res.status(500).send('Error updating a user');
+        res.status(404).send(`Product with id ${req.params.id} not found.`);
+      // else if (err === 'INVALID_DATA')
+      //   res.status(422).json({ validationErrors: validationErrors.details });
+      else res.status(500).send('Error updating a product.');
     });
 });
 
-router.delete('/:id', (req, res) => {
-  connection.query(
-    'DELETE FROM users WHERE id = ?',
-    [req.params.id],
-    (err, result) => {
-      if (err) {
-        console.log(err);
-        res.status(500).send('Error deleting an user');
-      } else {
-        if (result.affectedRows) res.status(200).send('🎉 User deleted!');
-        else res.status(404).send('User not found.');
-      }
-    }
-  );
+productsRouter.delete('/:id', (req, res) => {
+  Products.destroy(req.params.id)
+    .then((deleted) => {
+      if (deleted) res.status(200).send('Product deleted!');
+      else res.status(404).send('Product not found');
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(500).send('Error deleting a product');
+    });
 });
 
-module.exports = router;
+
+module.exports = productsRouter;

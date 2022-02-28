@@ -110,5 +110,5 @@ VALUES ("HUILE BIO DEMAQUILLANTE", 17, "HDEM21", "Contenance : 50 mL\nDurée d'u
 l'élasticité à la peau. Apaise les peaux irritées et protège les peaux sensibles.\nNourrit et apporte brillance aux cheveux. Protège les cheveux fins et agressés. Assouplit les cheveux épais.\nLe chondrus crispus (goëmon blanc) : Nourrit la peau en profondeur et apporte de la vitalité à l'épiderme")
 ;
 
-INSERT INTO users(id, firstname, password, email, isadmin, Address1, postCode, city)
-VALUES ( 1, 'admin', 'test', '','admin@example.com', true, '', 0 ,'');
+INSERT INTO users(id, firstname, lastname, `password`, email, isadmin, Address1, postCode, city)
+VALUES ( 1, 'admin', '', 'test', 'admin@example.com', true, '', 0 ,'');

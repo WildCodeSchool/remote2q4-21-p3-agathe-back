@@ -27,7 +27,6 @@ const hashPassword = (plainPassword) => {
 };
 
 const verifyPassword = (plainPassword, hashedPassword) => {
-    console.log(`hashedPassword: ${hashedPassword}, plainPassword: ${plainPassword}`)
     return argon2.verify(hashedPassword, plainPassword, hashingOptions);
 };
 

@@ -53,7 +53,7 @@ CREATE TABLE presentation (
 
 CREATE TABLE products (
     ProductID int  NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    name varchar(200)  NOT NULL ,
+    `name` varchar(200)  NOT NULL ,
     price decimal(5,2)  NOT NULL ,
     SKU varchar(13)  NOT NULL DEFAULT '',
     characteristic text  NOT NULL ,
@@ -61,14 +61,14 @@ CREATE TABLE products (
     ingredient text  NOT NULL ,
 
     CONSTRAINT `uc_Product_Name` UNIQUE (
-        `Name`
+        `name`
     )
 );
 
 CREATE TABLE users (
     id int  NOT NULL PRIMARY KEY,
     IsAdmin bool  NOT NULL default false,
-    password varchar(20) NOT NULL,
+    `password` varchar(255) NOT NULL,
     email varchar(55) NOT NULL,
     FirstName varchar(80) NOT NULL,
     LastName varchar(80) NOT NULL,
@@ -111,4 +111,4 @@ l'élasticité à la peau. Apaise les peaux irritées et protège les peaux sens
 ;
 
 INSERT INTO users(id, firstname, lastname, `password`, email, isadmin, Address1, postCode, city)
-VALUES ( 1, 'admin', '', 'test', 'admin@example.com', true, '', 0 ,'');
+VALUES ( 1, 'admin', '', '$argon2i$v=19$m=4096,t=3,p=1$wkqEhPhX1FZ9ZHdLinesLw$G5UATWBEKq++UpMHK2CnvNYnnbCANu06mVzGv7dX/94', 'admin@example.com', true, '', 0 ,'');

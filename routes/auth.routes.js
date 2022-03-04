@@ -33,7 +33,7 @@ authRouter.post('/login', async(req, res, next) => {
                             if (passwordIsCorrect) {
                                 /* 6. On créer le JWT */
                                 const token = calculateJWTToken(user);
-                                res.cookie("user_token", token, { httpOnly: true, secure: true });
+                                res.cookie("user_token", token, { httpOnly: true }); //, secure: true }); HTTPS ONLY
                                 res.send();
                             } else res.status(401).send('Invalid credentials');
                         })

@@ -1,5 +1,6 @@
 const productsRouter = require("express").Router();
 const Products = require("../models/products");
+const Ingredients = require("../models/ingredients");
 
 
 productsRouter.get('/', (req, res) => {
@@ -16,14 +17,21 @@ productsRouter.get('/', (req, res) => {
 
 productsRouter.get('/:id', (req, res) => {
     Products.findOne(req.params.id)
-        .then((products) => {
-            if (products) {
-                res.json(products);
+        .then((product) => {
+            if (product) {
+                Ingredients.ingredientsForProduct(product.ProductID)
+                .then((ingredients) => {
+                    product.ingredients = ingredients             
+                }
+                )
+                console.log(product)
+                res.json(product);
             } else {
                 res.status(404).send('Product not found');
             }
         })
         .catch((err) => {
+            console.log(err)
             res.status(500).send('Error retrieving product from database');
         });
 });

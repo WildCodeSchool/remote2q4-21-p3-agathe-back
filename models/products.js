@@ -11,7 +11,7 @@ const findMany = () => {
 
 const findOne = (id) => {
     return db
-        .query('SELECT * FROM products WHERE productid = ?', [id])
+        .query('SELECT * FROM products WHERE productid = ?', [id], {plain: true})
         .then(([results]) => results[0]);
 };
 

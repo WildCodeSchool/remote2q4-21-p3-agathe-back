@@ -20,12 +20,10 @@ productsRouter.get('/:id', (req, res) => {
         .then((product) => {
             if (product) {
                 Ingredients.ingredientsForProduct(product.ProductID)
-                .then((ingredients) => {
-                    product.ingredients = ingredients             
-                }
-                )
-                console.log(product)
-                res.json(product);
+                    .then((ingredients) => {
+                        product.ingredients = ingredients
+                        res.json(product);
+                    })
             } else {
                 res.status(404).send('Product not found');
             }
@@ -64,7 +62,10 @@ productsRouter.put('/:id', (req, res) => {
             return Products.update(req.params.id, req.body);
         })
         .then(() => {
-            res.status(200).json({...existingProducts, ...req.body });
+            res.status(200).json({
+                ...existingProducts,
+                ...req.body
+            });
         })
         .catch((err) => {
             console.error(err);

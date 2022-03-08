@@ -1,5 +1,6 @@
 const productsRouter = require("express").Router();
 const Products = require("../models/products");
+const Ingredients = require("../models/ingredients");
 
 
 productsRouter.get('/', (req, res) => {
@@ -16,14 +17,19 @@ productsRouter.get('/', (req, res) => {
 
 productsRouter.get('/:id', (req, res) => {
     Products.findOne(req.params.id)
-        .then((products) => {
-            if (products) {
-                res.json(products);
+        .then((product) => {
+            if (product) {
+                Ingredients.ingredientsForProduct(product.ProductID)
+                    .then((ingredients) => {
+                        product.ingredients = ingredients
+                        res.json(product);
+                    })
             } else {
                 res.status(404).send('Product not found');
             }
         })
         .catch((err) => {
+            console.log(err)
             res.status(500).send('Error retrieving product from database');
         });
 });
@@ -56,7 +62,10 @@ productsRouter.put('/:id', (req, res) => {
             return Products.update(req.params.id, req.body);
         })
         .then(() => {
-            res.status(200).json({...existingProducts, ...req.body });
+            res.status(200).json({
+                ...existingProducts,
+                ...req.body
+            });
         })
         .catch((err) => {
             console.error(err);

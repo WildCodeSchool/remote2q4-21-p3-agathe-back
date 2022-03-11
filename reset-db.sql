@@ -80,6 +80,7 @@ CREATE TABLE users (
     email varchar(55) NOT NULL,
     FirstName varchar(80) NOT NULL,
     LastName varchar(80) NOT NULL,
+    PhoneNumber varchar(16) NOT NULL,
     Address1 varchar(80) NOT NULL,
     Address2 varchar(80) NULL,
     Address3 varchar(80) NULL,
@@ -119,8 +120,8 @@ VALUES (1, "HUILE BIO DEMAQUILLANTE", 17, "HDEM21", "Contenance : 50 mL\nDurée 
 (3, "HUILE DE MASSAGE BIO", 34, "HMAS21", "Contenance : 50 mL\nDurée d'utilisation : 1 mois et demi environ", "Si l’huile de massage est un réflexe des sportifs, elle conviendra tout aussi bien aux personnes cherchant à prendre soin d’elles pour un moment de détente. L’action mêlée du CBD à celle du fucus et de la criste marine permet à l’huile de massage d’à la fois soulager vos douleurs (articulaires, musculaires,…) tout en activant la microcirculation, drainant et éliminant les toxines. Bien-être assuré!"),
 (4, "HUILE SECHE CORPS & CHEVEUX BIO", 20, "HCOCH21", "Contenance : 50 mL\nDurée d'utilisation : 2 mois environ (40 utilisations)", "L’huile sèche corps et cheveux est enrichie en Chondrus Crispus (goëmon blanc). Elle vous apportera une nutrition intense de la peau ou des cheveux tout en laissant un toucher doux et doyeux accompagné d'une délicate odeur de vanille");
 
-INSERT INTO users(id, firstname, lastname, `password`, email, isadmin, Address1, postCode, city)
-VALUES ( 1, 'admin', '', '$argon2i$v=19$m=4096,t=3,p=1$wkqEhPhX1FZ9ZHdLinesLw$G5UATWBEKq++UpMHK2CnvNYnnbCANu06mVzGv7dX/94', 'admin@example.com', true, '', 0 ,'');
+INSERT INTO users(id, firstname, lastname, phonenumber, `password`, email, isadmin, Address1, postCode, city)
+VALUES ( 1, 'admin', '', '0123456789', '$argon2i$v=19$m=4096,t=3,p=1$wkqEhPhX1FZ9ZHdLinesLw$G5UATWBEKq++UpMHK2CnvNYnnbCANu06mVzGv7dX/94', 'admin@example.com', true, '', 0 ,'');
 
 -- Insert ingrédients
 INSERT INTO ingredients(ProductID, name, description)

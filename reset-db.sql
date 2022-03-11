@@ -121,7 +121,8 @@ VALUES (1, "HUILE BIO DEMAQUILLANTE", 17, "HDEM21", "Contenance : 50 mL\nDurée 
 (4, "HUILE SECHE CORPS & CHEVEUX BIO", 20, "HCOCH21", "Contenance : 50 mL\nDurée d'utilisation : 2 mois environ (40 utilisations)", "L’huile sèche corps et cheveux est enrichie en Chondrus Crispus (goëmon blanc). Elle vous apportera une nutrition intense de la peau ou des cheveux tout en laissant un toucher doux et doyeux accompagné d'une délicate odeur de vanille");
 
 INSERT INTO users(id, firstname, lastname, phonenumber, `password`, email, isadmin, Address1, postCode, city)
-VALUES ( 1, 'admin', '', '0123456789', '$argon2i$v=19$m=4096,t=3,p=1$wkqEhPhX1FZ9ZHdLinesLw$G5UATWBEKq++UpMHK2CnvNYnnbCANu06mVzGv7dX/94', 'admin@example.com', true, '', 0 ,'');
+VALUES ( 1, 'admin', '', '0123456789', '$argon2i$v=19$m=4096,t=3,p=1$wkqEhPhX1FZ9ZHdLinesLw$G5UATWBEKq++UpMHK2CnvNYnnbCANu06mVzGv7dX/94', 'admin@example.com', true, '', 0 ,''),
+ ( 2, 'test', '', '0123456789', '$argon2i$v=19$m=4096,t=3,p=1$wkqEhPhX1FZ9ZHdLinesLw$G5UATWBEKq++UpMHK2CnvNYnnbCANu06mVzGv7dX/94', 'test@example.com', false, '', 0 ,'');
 
 -- Insert ingrédients
 INSERT INTO ingredients(ProductID, name, description)

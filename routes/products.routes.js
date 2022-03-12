@@ -2,9 +2,7 @@ const productsRouter = require("express").Router();
 const Products = require("../models/products");
 const Ingredients = require("../models/ingredients");
 
-
 productsRouter.get('/', (req, res) => {
-    // const {  } = req.query;
     Products.findMany()
         .then((products) => {
             res.json(products);
@@ -88,6 +86,5 @@ productsRouter.delete('/:id', (req, res) => {
             res.status(500).send('Error deleting a product');
         });
 });
-
 
 module.exports = productsRouter;

@@ -1,36 +1,28 @@
-const connection = require("../db-config");
 const router = require("express").Router();
 const Joi = require('joi');
 const argon2 = require('argon2');
 const { generateJwt } = require('../utils/auth');
 const checkJwt = require('../middlewares/checkJwt')
+const Users = require('../models/users');
 
-const { findUserByEmail, insertUser } = require('../models/users');
+router.get('/', checkJwt, (req, res) =>
+    Users.findMany()
+    .then(users => res.json(result))
+    .catch(err => {
+        res.status(500).send('Error retrieving users from database');
+    })
+);
 
-router.get('/', checkJwt, (req, res) => {
-    connection.query('SELECT * FROM users', (err, result) => {
-        if (err) {
-            res.status(500).send('Error retrieving users from database');
-        } else {
-            res.json(result);
-        }
-    });
-});
-
-router.get('/:id', (req, res) => {
-    const userId = req.params.id;
-    connection.query(
-        'SELECT * FROM users WHERE id = ?', [userId],
-        (err, results) => {
-            if (err) {
-                res.status(500).send('Error retrieving user from database');
-            } else {
-                if (results.length) res.json(results[0]);
-                else res.status(404).send('User not found');
-            }
-        }
-    );
-});
+router.get('/:id', (req, res) =>
+    Users.findOne(req.params.id)
+    .then(user => {
+        if (user.length) res.json(results[0]);
+        else res.status(404).send('User not found');
+    })
+    .catch(err => {
+        res.status(500).send('Error retrieving user from database');
+    })
+);
 
 const userSchema = Joi.object({
     email: Joi.string().email().required(),
@@ -48,7 +40,7 @@ router.post('/', async(req, res) => {
     // await permet d'etre sur d'avoir un retour de verif user
     const [
         [existingUser]
-    ] = await findUserByEmail(value.email);
+    ] = await Users.findUserByEmail(value.email);
     if (existingUser) {
         return res.status(409).json({
             message: "l'utilisateur existe deja",
@@ -57,7 +49,7 @@ router.post('/', async(req, res) => {
 
     // etape de l'encryptage
     const hashedPassword = await argon2.hash(value.password);
-    await insertUser(value.email, hashedPassword, 'ROLE_USER');
+    await Users.insertUser(value.email, hashedPassword, 'ROLE_USER');
 
     const jwtKey = generateJwt(value.email, 'ROLE_USER');
     return res.json({

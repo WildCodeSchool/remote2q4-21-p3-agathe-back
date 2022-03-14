@@ -1,11 +1,16 @@
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
-const generateJwt = (email, role) => jwt.sign({
+const generateJWT = (email, is_admin) => jwt.sign({
     email,
-    role
+    is_admin
 }, process.env.JWT_SECRET);
 
+const decodeJWT = (token) => {
+    return jwt.decode(token);
+};
+
 module.exports = {
-    generateJwt
+    generateJWT,
+    decodeJWT
 };

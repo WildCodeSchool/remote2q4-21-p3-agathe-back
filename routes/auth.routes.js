@@ -1,7 +1,9 @@
+const cookieParser = require('cookie-parser');
 const jwt = require('jsonwebtoken');
 const authRouter = require("express").Router();
-const { calculateJWTToken } = require('../helpers/users');
-//const { User, RefreshToken } = require('./models');
+// const { calculateJWTToken } = require('../helpers/users');
+const { generateJWT, decodeJWT } = require('../utils/auth')
+    //const { User, RefreshToken } = require('./models');
 const User = require('../models/users');
 // const config = require('./config');
 
@@ -31,10 +33,13 @@ authRouter.post('/login', async(req, res, next) => {
                         .then(passwordIsCorrect => {
                             if (passwordIsCorrect) {
                                 /* 6. On créer le JWT */
-                                const token = calculateJWTToken(user);
-                                // res.cookie("user_token", token, { httpOnly: true }); //, secure: true }); HTTPS ONLY
-                                // res.send();
-                                res.json({ credentials: token });
+                                // const token = calculateJWTToken(user);
+                                const token = generateJWT(user.email, user.IsAdmin);
+                                let date = new Date();
+                                date.setTime(date.getTime() + (60 * 60 * 1000)); // expires in 1 hour
+                                res.cookie("user_token", token, { expires: date, httpOnly: true }); //, secure: true }); HTTPS ONLY
+                                res.send();
+                                // res.json({ credentials: token });
                             } else res.status(401).send('Invalid credentials');
                         })
                 }
@@ -59,6 +64,25 @@ authRouter.post('/login', async(req, res, next) => {
         // });
     } catch (err) {
         return res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+authRouter.get('/admin', async(req, res, next) => {
+    try {
+        const { cookies } = req;
+        // Check if the JWT is present in the request's cookies
+        if (!cookies || !cookies.user_token) {
+            return res.status(401).json({ message: 'Missing token in cookie' });
+        }
+        const user_token = decodeJWT(cookies.user_token);
+        if (user_token.is_admin) {
+            return res.status(202).json({ message: '' }) // Accepted
+        } else {
+            res.status(403).json({ message: '' }) // Forbidden
+        }
+    } catch (err) {
+        console.log('error')
+        console.log(err)
     }
 });
 

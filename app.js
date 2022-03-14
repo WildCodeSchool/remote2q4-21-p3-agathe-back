@@ -1,5 +1,6 @@
 const connection = require('./db-config');
 const express = require('express');
+const cookieParser = require('cookie-parser');
 const cors = require('cors');
 const app = express();
 const router = require('./routes/index.routes');
@@ -14,6 +15,7 @@ connection.connect((err) => {
     }
 });
 
+app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -28,8 +30,6 @@ app.use('/api', router);
 app.get("/", (req, res) => {
     res.send("Welcome");
 });
-
-
 
 app.listen(port, () => {
     console.log(`Server listening on port ${port}`);

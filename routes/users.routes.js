@@ -1,7 +1,7 @@
 const router = require("express").Router();
 const Joi = require('joi');
 const argon2 = require('argon2');
-const { generateJwt } = require('../utils/auth');
+const { generateJWT } = require('../utils/auth')
 const checkJwt = require('../middlewares/checkJwt')
 const Users = require('../models/users');
 
@@ -27,12 +27,21 @@ router.get('/:id', (req, res) =>
 const userSchema = Joi.object({
     email: Joi.string().email().required(),
     password: Joi.string().required(),
+    FirstName: Joi.string().required(),
+    LastName: Joi.string().required(),
+    PhoneNumber: Joi.string().required(),
+    Address1: Joi.string().required(),
+    Address2: Joi.string().allow(null, ''),
+    Address3: Joi.string().allow(null, ''),
+    postCode: Joi.string().required(),
+    city: Joi.string().required()
 })
 
 router.post('/', async(req, res) => {
     // recup donnees requete
     const { value, error } = userSchema.validate(req.body);
     if (error) {
+        console.log(error)
         return res.status(400).json(error);
     }
 
@@ -54,37 +63,26 @@ router.post('/', async(req, res) => {
         value.PhoneNumber, value.Address1, value.Address2, value.Address3,
         value.postCode, value.city);
 
-    const jwtKey = generateJwt(value.email, 'ROLE_USER');
-    return res.json({
-        credentials: jwtKey,
-    })
-
-    // return res.json({
-    //     message: "l'utilisateur a bien ete cree"
-    // })
-
+    const jwtKey = generateJWT(value.email, 'ROLE_USER');
+    return res.json({ credentials: jwtKey })
 })
 
-// router.put('/:id', (req, res) => {
-//     const userId = req.params.id;
-//     const db = connection.promise();
-//     let existingUser = null;
-//     db.query('SELECT * FROM users WHERE id = ?', [userId])
-//         .then(([results]) => {
-//             existingUser = results[0];
-//             if (!existingUser) return Promise.reject('RECORD_NOT_FOUND');
-//             return db.query('UPDATE users SET ? WHERE id = ?', [req.body, userId]);
-//         })
-//         .then(() => {
-//             res.status(200).json({...existingUser, ...req.body });
-//         })
-//         .catch((err) => {
-//             console.error(err);
-//             if (err === 'RECORD_NOT_FOUND')
-//                 res.status(404).send(`User with id ${userId} not found.`);
-//             else res.status(500).send('Error updating a user');
-//         });
-// });
+router.put('/:id', (req, res) => {
+    const userId = req.params.id;
+    try {
+        let existingUser = await Users.findOne(userId);
+        if (!existingUser) throw new Error('RECORD_NOT_FOUND');
+        // etape de l'encryptage
+        const hashedPassword = await argon2.hash(req.body.password);
+        await Users.updateUser({...req.body, id: userId, password: hashedPassword });
+        res.status(200).json({...existingUser, ...req.body });
+    } catch (error) {
+        console.error(err);
+        if (err === 'RECORD_NOT_FOUND')
+            res.status(404).send(`User with id ${userId} not found.`);
+        else res.status(500).send('Error updating a user');
+    }
+});
 
 // router.delete('/:id', (req, res) => {
 //     connection.query(

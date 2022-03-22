@@ -75,7 +75,7 @@ CREATE TABLE Ingredients (
 );
 
 CREATE TABLE users (
-    id int  NOT NULL PRIMARY KEY,
+    id int  NOT NULL PRIMARY KEY AUTO_INCREMENT,
     IsAdmin bool  NOT NULL default false,
     `password` varchar(255) NOT NULL,
     email varchar(55) NOT NULL,

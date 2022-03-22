@@ -1,7 +1,7 @@
 const router = require("express").Router();
 const Joi = require('joi');
 const argon2 = require('argon2');
-const { generateJwt } = require('../utils/auth');
+const { generateJWT } = require('../utils/auth')
 const checkJwt = require('../middlewares/checkJwt')
 const Users = require('../models/users');
 
@@ -27,12 +27,21 @@ router.get('/:id', (req, res) =>
 const userSchema = Joi.object({
     email: Joi.string().email().required(),
     password: Joi.string().required(),
+    FirstName: Joi.string().required(),
+    LastName: Joi.string().required(),
+    PhoneNumber: Joi.string().required(),
+    Address1: Joi.string().required(),
+    Address2: Joi.string().allow(null, ''),
+    Address3: Joi.string().allow(null, ''),
+    postCode: Joi.string().required(),
+    city: Joi.string().required()
 })
 
 router.post('/', async(req, res) => {
     // recup donnees requete
     const { value, error } = userSchema.validate(req.body);
     if (error) {
+        console.log(error)
         return res.status(400).json(error);
     }
 
@@ -54,10 +63,8 @@ router.post('/', async(req, res) => {
         value.PhoneNumber, value.Address1, value.Address2, value.Address3,
         value.postCode, value.city);
 
-    const jwtKey = generateJwt(value.email, 'ROLE_USER');
-    return res.json({
-        credentials: jwtKey,
-    })
+    const jwtKey = generateJWT(value.email, 'ROLE_USER');
+    return res.json({ credentials: jwtKey })
 
     // return res.json({
     //     message: "l'utilisateur a bien ete cree"

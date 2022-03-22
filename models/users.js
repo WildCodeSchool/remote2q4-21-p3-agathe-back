@@ -7,9 +7,12 @@ const findUserByEmail = (email) =>
     db
     .query('SELECT * FROM users WHERE email=?', [email]);
 
-const insertUser = (email, password, role) =>
+const insertUser = (email, password, FirstName, LastName, PhoneNumber,
+        Address1, Address2, Address3, postCode, city) =>
     db
-    .query('INSERT INTO users (`email`, `password`, `role`) VALUES (?, ?, ?)', [email, password, role]);
+    .query('INSERT INTO users (email, password, FirstName, LastName, PhoneNumber,\
+         Address1, Address2, Address3, postCode, city) \
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [email, password, FirstName, LastName, PhoneNumber, Address1, Address2, Address3, postCode, city]);
 
 const authenticate = (email, password) =>
     db

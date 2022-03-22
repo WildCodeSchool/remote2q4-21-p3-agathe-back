@@ -65,33 +65,24 @@ router.post('/', async(req, res) => {
 
     const jwtKey = generateJWT(value.email, 'ROLE_USER');
     return res.json({ credentials: jwtKey })
-
-    // return res.json({
-    //     message: "l'utilisateur a bien ete cree"
-    // })
-
 })
 
-// router.put('/:id', (req, res) => {
-//     const userId = req.params.id;
-//     const db = connection.promise();
-//     let existingUser = null;
-//     db.query('SELECT * FROM users WHERE id = ?', [userId])
-//         .then(([results]) => {
-//             existingUser = results[0];
-//             if (!existingUser) return Promise.reject('RECORD_NOT_FOUND');
-//             return db.query('UPDATE users SET ? WHERE id = ?', [req.body, userId]);
-//         })
-//         .then(() => {
-//             res.status(200).json({...existingUser, ...req.body });
-//         })
-//         .catch((err) => {
-//             console.error(err);
-//             if (err === 'RECORD_NOT_FOUND')
-//                 res.status(404).send(`User with id ${userId} not found.`);
-//             else res.status(500).send('Error updating a user');
-//         });
-// });
+router.put('/:id', (req, res) => {
+    const userId = req.params.id;
+    try {
+        let existingUser = await Users.findOne(userId);
+        if (!existingUser) throw new Error('RECORD_NOT_FOUND');
+        // etape de l'encryptage
+        const hashedPassword = await argon2.hash(req.body.password);
+        await Users.updateUser({...req.body, id: userId, password: hashedPassword });
+        res.status(200).json({...existingUser, ...req.body });
+    } catch (error) {
+        console.error(err);
+        if (err === 'RECORD_NOT_FOUND')
+            res.status(404).send(`User with id ${userId} not found.`);
+        else res.status(500).send('Error updating a user');
+    }
+});
 
 // router.delete('/:id', (req, res) => {
 //     connection.query(

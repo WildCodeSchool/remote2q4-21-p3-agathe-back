@@ -49,7 +49,10 @@ router.post('/', async(req, res) => {
 
     // etape de l'encryptage
     const hashedPassword = await argon2.hash(value.password);
-    await Users.insertUser(value.email, hashedPassword, 'ROLE_USER');
+
+    await Users.insertUser(value.email, hashedPassword, value.FirstName, value.LastName,
+        value.PhoneNumber, value.Address1, value.Address2, value.Address3,
+        value.postCode, value.city);
 
     const jwtKey = generateJwt(value.email, 'ROLE_USER');
     return res.json({

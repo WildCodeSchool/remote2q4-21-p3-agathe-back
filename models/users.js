@@ -3,13 +3,39 @@ const argon2 = require("argon2");
 
 const db = connection.promise();
 
+const findOne = (id) =>
+    db
+    .query('SELECT * FROM users WHERE id=?', [id])
+    .then(([results]) => results[0]);
+
 const findUserByEmail = (email) =>
     db
     .query('SELECT * FROM users WHERE email=?', [email]);
 
-const insertUser = (email, password, role) =>
+const insertUser = (email, password, FirstName, LastName, PhoneNumber,
+        Address1, Address2, Address3, postCode, city) =>
     db
-    .query('INSERT INTO users (`email`, `password`, `role`) VALUES (?, ?, ?)', [email, password, role]);
+    .query('INSERT INTO users (email, password, FirstName, LastName, PhoneNumber,\
+         Address1, Address2, Address3, postCode, city) \
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [email, password, FirstName, LastName, PhoneNumber, Address1, Address2, Address3, postCode, city]);
+
+const updateUser = ({
+        id,
+        email,
+        password,
+        FirstName,
+        LastName,
+        PhoneNumber,
+        Address1,
+        Address2,
+        Address3,
+        postCode,
+        city
+    }) =>
+    db
+    .query('UPDATE users set (email=?, password=?, FirstName=?, LastName=?, PhoneNumber=?,\
+             Address1=?, Address2=?, Address3=?, postCode=?, city=?) \
+            WHERE id=?', [email, password, FirstName, LastName, PhoneNumber, Address1, Address2, Address3, postCode, city, id]);
 
 const authenticate = (email, password) =>
     db
@@ -33,6 +59,7 @@ const verifyPassword = (plainPassword, hashedPassword) => {
 module.exports = {
     findUserByEmail,
     insertUser,
+    updateUser,
     authenticate,
     hashPassword,
     verifyPassword,

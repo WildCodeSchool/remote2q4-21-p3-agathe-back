@@ -67,7 +67,7 @@ router.post('/', async(req, res) => {
     return res.json({ credentials: jwtKey })
 })
 
-router.put('/:id', (req, res) => {
+router.put('/:id', async(req, res) => {
     const userId = req.params.id;
     try {
         let existingUser = await Users.findOne(userId);

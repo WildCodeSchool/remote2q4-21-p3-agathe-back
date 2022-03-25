@@ -31,7 +31,7 @@ CREATE TABLE orders (
 );
 
 CREATE TABLE OrderLine (
-    OrderLineID int NOT NULL PRIMARY KEY,
+    OrderLineID int NOT NULL PRIMARY KEY AUTO_INCREMENT,
     OrderID int NOT NULL,
     ProductID int NOT NULL,
     Quantity int NOT NULL,
@@ -39,14 +39,14 @@ CREATE TABLE OrderLine (
 );
 
 CREATE TABLE OrderStatus (
-    OrderStatusID int  NOT NULL PRIMARY KEY,
-    name varchar(20)  NOT NULL ,
-    OrderDate date  NOT NULL ,
-    ShippingDate date  NOT NULL ,
+    OrderStatusID int NOT NULL PRIMARY KEY,
+    name varchar(20) NOT NULL ,
+    OrderDate date NOT NULL ,
+    ShippingDate date --  NOT NULL ,
 
-    CONSTRAINT `uc_OrderStatus_Name` UNIQUE (
-        `Name`
-    )
+    -- CONSTRAINT `uc_OrderStatus_Name` UNIQUE (
+    --     `Name`
+    -- )
 );
 
 CREATE TABLE presentation (
@@ -68,7 +68,7 @@ CREATE TABLE products (
 );
 
 CREATE TABLE Ingredients (
-    IngredientID int  NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    IngredientID int NOT NULL AUTO_INCREMENT PRIMARY KEY,
     `name` varchar(255) NOT NULL,
     description text NOT NULL,
     ProductID int  NOT NULL
@@ -123,20 +123,51 @@ VALUES (1, "HUILE BIO DEMAQUILLANTE", 17, "HDEM21", "Contenance : 50 mL\nDurée 
 
 INSERT INTO users(id, firstname, lastname, phonenumber, `password`, email, isadmin, Address1, postCode, city)
 VALUES ( 1, 'admin', '', '0123456789', '$argon2i$v=19$m=4096,t=3,p=1$wkqEhPhX1FZ9ZHdLinesLw$G5UATWBEKq++UpMHK2CnvNYnnbCANu06mVzGv7dX/94', 'admin@example.com', true, '', 0 ,''),
- ( 2, 'test', '', '0123456789', '$argon2i$v=19$m=4096,t=3,p=1$wkqEhPhX1FZ9ZHdLinesLw$G5UATWBEKq++UpMHK2CnvNYnnbCANu06mVzGv7dX/94', 'test@example.com', false, '', 0 ,'');
+ ( 2, 'test', '', '0123456789', '$argon2i$v=19$m=4096,t=3,p=1$wkqEhPhX1FZ9ZHdLinesLw$G5UATWBEKq++UpMHK2CnvNYnnbCANu06mVzGv7dX/94', 'test@example.com', false, '', 0 ,''),
+ ( 3, 'Jean', 'Dupont', '0123456789', '$argon2i$v=19$m=4096,t=3,p=1$wkqEhPhX1FZ9ZHdLinesLw$G5UATWBEKq++UpMHK2CnvNYnnbCANu06mVzGv7dX/94', 'jean.dupont@example.com', false, '', 0 ,''),
+ ( 4, 'Pierre', 'Martin', '0123456789', '$argon2i$v=19$m=4096,t=3,p=1$wkqEhPhX1FZ9ZHdLinesLw$G5UATWBEKq++UpMHK2CnvNYnnbCANu06mVzGv7dX/94', 'pierre.martin@example.com', false, '', 0 ,''),
+ ( 5, 'Franck', 'Thomas', '0123456789', '$argon2i$v=19$m=4096,t=3,p=1$wkqEhPhX1FZ9ZHdLinesLw$G5UATWBEKq++UpMHK2CnvNYnnbCANu06mVzGv7dX/94', 'franck.thomas@example.com', false, '', 0 ,'')
+ ;
 
 -- Insert ingrédients
-INSERT INTO ingredients(ProductID, name, description)
-VALUES (1, "L'huile de caméline", "Huile anti-âge (très riche en oméga 3, 6 et 9), régule le sébum, lutte contre l'apparition des ridules liées à la déshydratation, apporte éclat et souplesse à la peau."),
-(2, "L'huile de caméline", "Huile anti-âge (très riche en oméga 3, 6 et 9), régule le sébum, lutte contre l'apparition des ridules liées à la déshydratation, apporte éclat et souplesse à la peau."),
+INSERT INTO ingredients(ProductID, name, description) VALUES
+(1, "L'huile de caméline", "Huile anti-âge (très riche en oméga 3, 6 et 9), régule le sébum, lutte contre l'apparition des ridules liées à la déshydratation, apporte éclat et souplesse à la peau."),
 (1, "La palmaria (algue rouge)", "Elimine les toxines, défatigue le regard, active la microcirculation cutanée."),
 (1, "L'huile essentielle de géranium rosat", "Equilibrante, astringente, calmante et apaisante."),
+(2, "L'huile de caméline", "Huile anti-âge (très riche en oméga 3, 6 et 9), régule le sébum, lutte contre l'apparition des ridules liées à la déshydratation, apporte éclat et souplesse à la peau."),
 (2, "L'huile essentielle de géranium rosat", "Equilibrante, astringente, calmante et apaisante."),
 (2, "La wakamé (algue)", "Unifie et dégrise le teint, protège la peau des dommages induits par les UV, les conditions climatiques rudes, la pollution."),
 (2, "L'huile de carotte", "Illumine la peau, donne un effet bonne mine, protège votre peau des attaques extérieures et la prépare au soleil."),
 (3, "L'huile de caméline", "Assouplissante et adoucissante, apporte de l'élasticité à la peau. Apaise les peaux irritées et protège les peaux sensibles."),
-(4, "L'huile de caméline", "Assouplissante et adoucissante, apporte de l'élasticité à la peau. Apaise les peaux irritées et protège les peaux sensibles."),
 (3, "Le fucus", "Draine et ellimine les toxines. Propriétés anti-inflammatoires pour les articulations douloureuses."),
 (3, "Le CBD", "Apaisant, anti-inflammatoire, émollient, cicatrisant."),
 (3, "L'huile essentielle de criste marine", "Raffermissante, régénérante, anti-cellulitique."),
-(4, "Le chondrus crispus (goëmon blanc)", "Nourrit la peau en profondeur et apporte de la vitalité à l'épiderme.");
+(4, "L'huile de caméline", "Assouplissante et adoucissante, apporte de l'élasticité à la peau. Apaise les peaux irritées et protège les peaux sensibles."),
+(4, "Le chondrus crispus (goëmon blanc)", "Nourrit la peau en profondeur et apporte de la vitalité à l'épiderme.")
+;
+
+INSERT INTO OrderStatus(OrderStatusID, name, OrderDate, ShippingDate) VALUES
+(1, 'En attente', '20220120', null),
+(2, 'En attente', '20220125', null),
+(3, 'En attente', '20220125', null),
+(4, 'En attente', '20220126', null),
+(5, 'En attente', '20220131', null)
+;
+
+INSERT INTO orders (OrderID, UserID, TotalAmount, OrderStatusID, UserComments) VALUES
+(1, 3,  17, 1, ''),
+(2, 4,  68, 2, 'Merci'),
+(3, 5, 100, 3, ''),
+(4, 3,  20, 4, ''),
+(5, 5,  41, 5, '')
+;
+
+INSERT INTO OrderLine (OrderID, ProductID, Quantity, Price) VALUES
+(1, 1, 1,  17),
+(2, 3, 1,  34),
+(2, 1, 2,  17),
+(3, 4, 5, 100),
+(4, 4, 1,  20),
+(5, 2, 1,  21),
+(5, 4, 1,  20)
+;

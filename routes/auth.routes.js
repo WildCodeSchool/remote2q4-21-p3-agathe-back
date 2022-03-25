@@ -34,7 +34,8 @@ authRouter.post('/login', async(req, res, next) => {
                                 let date = new Date();
                                 // date.setTime(date.getTime() + (60 * 60 * 1000));
                                 let oneHour = 60 * 60; // expires in 1 hour
-                                res.cookie("user_token", token, { expiresIn: oneHour, httpOnly: true }); //, secure: true }); HTTPS ONLY
+                                // res.cookie("user_token", token, { expiresIn: oneHour, httpOnly: true }); //, secure: true }); HTTPS ONLY
+                                res.cookie("user_token", token, { maxAge: oneHour * 1000, httpOnly: true }); //, secure: true }); HTTPS ONLY
                                 res.send();
                                 // res.json({ credentials: token });
                             } else res.status(401).send('Invalid credentials');
@@ -69,14 +70,18 @@ authRouter.post('/login', async(req, res, next) => {
 // @access  Private
 authRouter.get('/logout', async(req, res) => {
     // Set token to none and expire after 5 seconds
-    res.cookie('user_token', 'none', {
-        // expires: new Date(Date.now() + 5 * 1000),
-        expiresIn: 5,
-        httpOnly: true
-    })
-    res
-        .status(200)
-        .json({ success: true, message: 'User logged out successfully' })
+    // res.cookie('user_token', 'none', {
+    // expires: new Date(Date.now() + 5 * 1000),
+    // expiresIn: 5,
+    // expires: 0,
+    //     maxAge: 0,
+    //     httpOnly: true
+    // })
+    res.clearCookie('user_token', { maxAge: 60 * 60 * 1000, httpOnly: true })
+    res.end()
+        // res
+        //     .status(200)
+        //     .json({ success: true, message: 'User logged out successfully' })
 })
 
 authRouter.get('/admin', async(req, res) => {

@@ -8,20 +8,20 @@ const validate = ({Name,
     SKU,
     Characteristic,
     Description,
-    Ingredients}) => { return Joi.object({
+    Ingredients_details}) => { return Joi.object({
     Name: Joi.string().max(250).required(),
     Price: Joi.number().max(999).required(),
     SKU: Joi.string().max(13).uppercase().required(),
     Characteristic: Joi.string().required(),
     Description: Joi.string().required(),
-    Ingredients: Joi.string().required(),
+    Ingredients_details: Joi.string().required(),
 }).validate({
     Name,
     Price,
     SKU,
     Characteristic,
     Description,
-    Ingredients
+    Ingredients_details
 }, {
     abortEarly: false
 })};
@@ -45,10 +45,10 @@ const create = ({
     SKU,
     Characteristic,
     Description,
-    Ingredients
+    Ingredients_details
 }) => {
     return db
-        .query("INSERT INTO products (ProductID, Name, Price, SKU, Characteristic , Description, Ingredients) VALUES (?, ?, ?, ?, ?, ?, ?)", [ProductID, Name, Price, SKU, Characteristic, Description, Ingredient])
+        .query("INSERT INTO products (ProductID, Name, Price, SKU, Characteristic , Description, Ingredients_details) VALUES (?, ?, ?, ?, ?, ?, ?)", [ProductID, Name, Price, SKU, Characteristic, Description, Ingredients_details])
         .then(([results]) => {
             const id = results.insertID;
             return {
@@ -59,33 +59,13 @@ const create = ({
                 SKU,
                 Characteristic,
                 Description,
-                Ingredients
+                Ingredients_details
             };
         });
 };
 
 const update = (id, newAttributes) => {
-    validationErrors = Joi.object({
-        ProductID: Joi.number().required(),
-        Name: Joi.string().max(250).required(),
-        Price: Joi.number().max(1000).required(),
-        SKU: Joi.string().max(13).required(),
-        Characteristic: Joi.string().required(),
-        Description: Joi.string().required(),
-        Ingredient: Joi.string().required(),
-    }).validate({
-        ProductID,
-        Name,
-        Price,
-        SKU,
-        Characteristic,
-        Description,
-        Ingredient
-    }, {
-        abortEarly: false
-    }).error;
-    if (validationErrors) return Promise.reject('INVALID_DATA');
-    return db.query('UPDATE products SET ? WHERE id = ?', [newAttributes, id]);
+    return db.query('UPDATE products SET ? WHERE ProductID = ?', [newAttributes, id]);
 };
 
 const destroy = (id) => {

@@ -42,7 +42,10 @@ productsRouter.get('/:id', (req, res) => {
 });
 
 productsRouter.post('/', (req, res) => {
-    const { value, error } = Products.validate(req.body);
+    const {
+        value,
+        error
+    } = Products.validate(req.body);
     if (error) {
         res.status(422).json({
             validationErrors: error.details
@@ -54,11 +57,7 @@ productsRouter.post('/', (req, res) => {
             })
             .catch((err) => {
                 console.error(err);
-                if (err === 'INVALID_DATA')
-                res.status(422).json({
-                  validationErrors
-                });
-                else res.status(500).send('Error saving the product');
+                res.status(500).send('Error saving the product');
             });
     }
 
@@ -66,27 +65,30 @@ productsRouter.post('/', (req, res) => {
 
 productsRouter.put('/:id', (req, res) => {
     let existingProducts = null;
-    // let validationErrors = null;
     Products.findOne(req.params.id)
         .then((products) => {
             existingProducts = products;
             if (!existingProducts) return Promise.reject('RECORD_NOT_FOUND');
-            // validationErrors = Movie.validate(req.body, false);
-            // if (validationErrors) return Promise.reject('INVALID_DATA');
-            return Products.update(req.params.id, req.body);
+            const {
+                value,
+                error
+            } = Products.validate(req.body);
+            if (error) {
+                res.status(422).json({
+                    validationErrors: error.details
+                })
+            } else return Products.update(req.params.id, value);
         })
-        .then(() => {
+        .then((value) => {
             res.status(200).json({
                 ...existingProducts,
-                ...req.body
+                ...value
             });
         })
         .catch((err) => {
             console.error(err);
             if (err === 'RECORD_NOT_FOUND')
                 res.status(404).send(`Product with id ${req.params.id} not found.`);
-            // else if (err === 'INVALID_DATA')
-            //   res.status(422).json({ validationErrors: validationErrors.details });
             else res.status(500).send('Error updating a product.');
         });
 });

@@ -15,6 +15,15 @@ router.get('/', (req, res) =>
     })
 );
 
+router.get('/count', (req, res) =>
+    Users.count()
+    .then(users => res.json(users))
+    .catch(err => {
+        console.log(err)
+        res.status(500).send('Error retrieving users from database');
+    })
+);
+
 router.get('/:id', (req, res) =>
     Users.findOne(req.params.id)
     .then(user => {

@@ -27,7 +27,7 @@ router.get('/count', (req, res) =>
 router.get('/:id', (req, res) =>
     Users.findOne(req.params.id)
     .then(user => {
-        if (user.length) res.json(results[0]);
+        if (user) res.json(user);
         else res.status(404).send('User not found');
     })
     .catch(err => {

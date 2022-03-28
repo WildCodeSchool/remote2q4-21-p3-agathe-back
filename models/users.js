@@ -3,14 +3,19 @@ const argon2 = require("argon2");
 
 const db = connection.promise();
 
+const count = (id) =>
+    db
+    .query('SELECT count(*) as count FROM users')
+    .then(([results]) => results[0]);
+
 const findMany = (id) =>
     db
-    .query('SELECT * FROM users')
+    .query('SELECT id, email, firstname, lastname, phonenumber, address1, address2, address3, postcode, city FROM users')
     .then(([results]) => results);
 
 const findOne = (id) =>
     db
-    .query('SELECT * FROM users WHERE id=?', [id])
+    .query('SELECT id, email, firstname, lastname, phonenumber, address1, address2, address3, postcode, city FROM users WHERE id=?', [id])
     .then(([results]) => results[0]);
 
 const findUserByEmail = (email) =>
@@ -62,6 +67,8 @@ const verifyPassword = (plainPassword, hashedPassword) => {
 };
 
 module.exports = {
+    count,
+    findOne,
     findMany,
     findUserByEmail,
     insertUser,

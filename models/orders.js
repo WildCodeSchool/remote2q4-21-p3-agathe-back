@@ -7,6 +7,10 @@ const total = () =>
 db.query('SELECT SUM(TotalAmount) as total FROM orders')
 .then(([results]) => results[0]);
 
+const totalOrders = () =>
+db.query('SELECT COUNT(OrderID) as totalOrders from orders')
+.then(([results]) => results[0]);
+
 const findMany = () => {
     return db
         .query('SELECT o.OrderId, concat(p.sku, "-", p.name) as product,\
@@ -55,6 +59,7 @@ SELECT o.OrderId, concat(p.sku,"-", p.name) as product, concat(u.firstname," ", 
 */
 module.exports = {
     total,
+    totalOrders,
     findMany,
     // findOne,
     // create,

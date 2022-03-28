@@ -3,6 +3,10 @@ const connection = require("../db-config");
 
 const db = connection.promise();
 
+const total = () =>
+db.query('SELECT SUM(TotalAmount) as total FROM orders')
+.then(([results]) => results[0]);
+
 const findMany = () => {
     return db
         .query('SELECT o.OrderId, concat(p.sku, "-", p.name) as product,\
@@ -50,6 +54,7 @@ SELECT o.OrderId, concat(p.sku,"-", p.name) as product, concat(u.firstname," ", 
 
 */
 module.exports = {
+    total,
     findMany,
     // findOne,
     // create,

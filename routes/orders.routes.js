@@ -13,6 +13,15 @@ router.get('/', (req, res) =>
     })
 );
 
+router.get('/total', (req, res) =>
+    Orders.total()
+    .then(orders => res.json(orders))
+    .catch(err => {
+        console.log(err)
+        res.status(500).send('Erreur en cherchant le total des ventes dans la base de données')
+    })
+)
+
 // router.get('/:id', (req, res) =>
 //     Users.findOne(req.params.id)
 //     .then(user => {

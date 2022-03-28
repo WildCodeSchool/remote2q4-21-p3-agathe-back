@@ -22,6 +22,16 @@ router.get('/total', (req, res) =>
     })
 )
 
+router.get('/total_orders', (req, res) =>
+    Orders.totalOrders()
+    .then(orders => res.json(orders))
+    .catch(err => {
+        console.log(err)
+        res.status(500).send('Erreur en cherchant le total des commandes dans la base de données')
+    })
+)
+
+
 // router.get('/:id', (req, res) =>
 //     Users.findOne(req.params.id)
 //     .then(user => {

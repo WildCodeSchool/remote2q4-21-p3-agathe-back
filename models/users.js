@@ -3,12 +3,12 @@ const argon2 = require("argon2");
 
 const db = connection.promise();
 
-const count = (id) =>
+const count = () =>
     db
     .query('SELECT count(*) as count FROM users')
     .then(([results]) => results[0]);
 
-const findMany = (id) =>
+const findMany = () =>
     db
     .query('SELECT id, email, FirstName, LastName, phonenumber, address1, address2, address3, postcode, city FROM users')
     .then(([results]) => results);

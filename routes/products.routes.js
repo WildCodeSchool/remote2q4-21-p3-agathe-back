@@ -33,19 +33,22 @@ productsRouter.get('/:id', (req, res) => {
 });
 
 productsRouter.post('/', (req, res) => {
-    // const error = Movie.validate(req.body);
+    // const error = Products.validate(req.body);
     // if (error) {
-    //   res.status(422).json({ validationErrors: error.details });
+    //     res.status(422).json({
+    //         validationErrors: error.details
+    //     });
     // } else {
-    Products.create(req.body)
-        .then((createdProducts) => {
-            res.status(201).json(createdProducts);
-        })
-        .catch((err) => {
-            console.error(err);
-            res.status(500).send('Error saving the product');
-        });
+        Products.create(req.body)
+            .then((createdProducts) => {
+                res.status(201).json(createdProducts);
+            })
+            .catch((err) => {
+                console.error(err);
+                res.status(500).send('Error saving the product');
+            });
     // }
+
 });
 
 productsRouter.put('/:id', (req, res) => {

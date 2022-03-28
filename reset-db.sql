@@ -16,6 +16,7 @@ ALTER TABLE Ingredients DROP FOREIGN KEY fk_Ingredients_ProductID;
 
 DROP TABLE IF EXISTS orders;
 DROP TABLE IF EXISTS OrderLine;
+DROP TABLE IF EXISTS OrderStates;
 DROP TABLE IF EXISTS OrderStatus;
 DROP TABLE IF EXISTS presentation;
 DROP TABLE IF EXISTS products;
@@ -39,14 +40,15 @@ CREATE TABLE OrderLine (
 );
 
 CREATE TABLE OrderStatus (
-    OrderStatusID int NOT NULL PRIMARY KEY,
-    name varchar(20) NOT NULL ,
-    OrderDate date NOT NULL ,
-    ShippingDate date --  NOT NULL ,
+    OrderStatusID int NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    OrderId int not null,
+    StateID int not null,
+    StatusDate date NOT NULL
+);
 
-    -- CONSTRAINT `uc_OrderStatus_Name` UNIQUE (
-    --     `Name`
-    -- )
+CREATE TABLE OrderStates (
+    id int NOT NULL PRIMARY KEY,
+    state varchar(20) NOT NULL 
 );
 
 CREATE TABLE presentation (
@@ -146,15 +148,28 @@ INSERT INTO ingredients(ProductID, name, description) VALUES
 (4, "Le chondrus crispus (goëmon blanc)", "Nourrit la peau en profondeur et apporte de la vitalité à l'épiderme.")
 ;
 
-INSERT INTO OrderStatus(OrderStatusID, name, OrderDate, ShippingDate) VALUES
-(1, 'En attente', '20220120', null),
-(2, 'En attente', '20220125', null),
-(3, 'En attente', '20220125', null),
-(4, 'En attente', '20220126', null),
-(5, 'En attente', '20220131', null)
+-- -------------------------------------------
+-- Orders
+-- -------------------------------------------
+INSERT INTO OrderStates(id, state) VALUES
+(1, 'En attente'),
+(2, 'Payé'),
+(3, 'Envoyé')
 ;
 
-INSERT INTO orders (OrderID, UserID, TotalAmount, OrderStatusID, UserComments) VALUES
+INSERT INTO OrderStatus(OrderID, StateID, StatusDate) VALUES
+(1, 1, '20220120'),
+(1, 2, '20220120'),
+(1, 3, '20220120'),
+(2, 1, '20220125'),
+(2, 2, '20220125'),
+(3, 1, '20220125'),
+(4, 1, '20220126'),
+(5, 1, '20220131'),
+(5, 2, '20220201')
+;
+
+INSERT INTO orders(OrderID, UserID, TotalAmount, OrderStatusID, UserComments) VALUES
 (1, 3,  17, 1, ''),
 (2, 4,  68, 2, 'Merci'),
 (3, 5, 100, 3, ''),
@@ -166,7 +181,7 @@ INSERT INTO OrderLine (OrderID, ProductID, Quantity, Price) VALUES
 (1, 1, 1,  17),
 (2, 3, 1,  34),
 (2, 1, 2,  17),
-(3, 4, 5, 100),
+(3, 4, 5,  20),
 (4, 4, 1,  20),
 (5, 2, 1,  21),
 (5, 4, 1,  20)

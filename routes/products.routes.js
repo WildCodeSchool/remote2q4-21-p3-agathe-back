@@ -41,6 +41,15 @@ productsRouter.get('/:id', (req, res) => {
         });
 });
 
+productsRouter.get('/count', (req, res) =>
+    Products.count()
+    .then(products => res.json(products))
+    .catch(err => {
+        console.log(err)
+        res.status(500).send('Erreur en cherchant le nombre des produits dans la base de données')
+    })
+)
+
 productsRouter.post('/', (req, res) => {
     const {
         value,

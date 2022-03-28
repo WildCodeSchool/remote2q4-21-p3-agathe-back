@@ -13,6 +13,15 @@ productsRouter.get('/', (req, res) => {
         });
 });
 
+productsRouter.get('/count', (req, res) =>
+    Products.count()
+    .then(result => res.json(result))
+    .catch(err => {
+        console.log(`count ${err}`)
+        res.status(500).send('Error retrieving products from database');
+    })
+);
+
 productsRouter.get('/:id', (req, res) => {
     Products.findOne(req.params.id)
         .then((product) => {

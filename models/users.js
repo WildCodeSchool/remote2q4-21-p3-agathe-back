@@ -10,7 +10,7 @@ const count = (id) =>
 
 const findMany = (id) =>
     db
-    .query('SELECT id, email, firstname, lastname, phonenumber, address1, address2, address3, postcode, city FROM users')
+    .query('SELECT id, email, FirstName, LastName, phonenumber, address1, address2, address3, postcode, city FROM users')
     .then(([results]) => results);
 
 const findOne = (id) =>

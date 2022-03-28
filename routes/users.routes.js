@@ -5,10 +5,12 @@ const { generateJWT } = require('../utils/auth')
 const checkJwt = require('../middlewares/checkJwt')
 const Users = require('../models/users');
 
-router.get('/', checkJwt, (req, res) =>
+// router.get('/', checkJwt, (req, res) =>
+router.get('/', (req, res) =>
     Users.findMany()
-    .then(users => res.json(result))
+    .then(users => res.json(users))
     .catch(err => {
+        console.log(err)
         res.status(500).send('Error retrieving users from database');
     })
 );

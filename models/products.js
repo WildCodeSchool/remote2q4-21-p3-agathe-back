@@ -3,6 +3,29 @@ const Joi = require('joi');
 
 const db = connection.promise();
 
+const validate = ({Name,
+    Price,
+    SKU,
+    Characteristic,
+    Description,
+    Ingredients}) => { return Joi.object({
+    Name: Joi.string().max(250).required(),
+    Price: Joi.number().max(999).required(),
+    SKU: Joi.string().max(13).uppercase().required(),
+    Characteristic: Joi.string().required(),
+    Description: Joi.string().required(),
+    Ingredients: Joi.string().required(),
+}).validate({
+    Name,
+    Price,
+    SKU,
+    Characteristic,
+    Description,
+    Ingredients
+}, {
+    abortEarly: false
+})};
+
 const findMany = () => {
     return db
         .query('SELECT * FROM products')
@@ -22,28 +45,10 @@ const create = ({
     SKU,
     Characteristic,
     Description,
-    Ingredient
+    Ingredients
 }) => {
-    validationErrors = Joi.object({
-        Name: Joi.string().max(250).required(),
-        Price: Joi.number().max(1000).required(),
-        SKU: Joi.string().max(13).required(),
-        Characteristic: Joi.string().required(),
-        Description: Joi.string().required(),
-        Ingredient: Joi.string().required(),
-    }).validate({
-        Name,
-        Price,
-        SKU,
-        Characteristic,
-        Description,
-        Ingredient
-    }, {
-        abortEarly: false
-    }).error;
-    if (validationErrors) return Promise.reject('INVALID_DATA');
     return db
-        .query("INSERT INTO products (ProductID, Name, Price, SKU, Characteristic , Description, Ingredient) VALUES (?, ?, ?, ?, ?, ?, ?)", [ProductID, Name, Price, SKU, Characteristic, Description, Ingredient])
+        .query("INSERT INTO products (ProductID, Name, Price, SKU, Characteristic , Description, Ingredients) VALUES (?, ?, ?, ?, ?, ?, ?)", [ProductID, Name, Price, SKU, Characteristic, Description, Ingredient])
         .then(([results]) => {
             const id = results.insertID;
             return {
@@ -54,7 +59,7 @@ const create = ({
                 SKU,
                 Characteristic,
                 Description,
-                Ingredient
+                Ingredients
             };
         });
 };
@@ -79,7 +84,7 @@ const update = (id, newAttributes) => {
     }, {
         abortEarly: false
     }).error;
-    if (validationErrors) return res.status(422).send('INVALID_DATA');
+    if (validationErrors) return Promise.reject('INVALID_DATA');
     return db.query('UPDATE products SET ? WHERE id = ?', [newAttributes, id]);
 };
 
@@ -94,5 +99,6 @@ module.exports = {
     findOne,
     create,
     update,
-    destroy
+    destroy,
+    validate
 };

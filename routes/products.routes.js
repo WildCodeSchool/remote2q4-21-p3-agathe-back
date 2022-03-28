@@ -33,21 +33,25 @@ productsRouter.get('/:id', (req, res) => {
 });
 
 productsRouter.post('/', (req, res) => {
-    // const error = Products.validate(req.body);
-    // if (error) {
-    //     res.status(422).json({
-    //         validationErrors: error.details
-    //     });
-    // } else {
-        Products.create(req.body)
+    const { value, error } = Products.validate(req.body);
+    if (error) {
+        res.status(422).json({
+            validationErrors: error.details
+        });
+    } else {
+        Products.create(value)
             .then((createdProducts) => {
                 res.status(201).json(createdProducts);
             })
             .catch((err) => {
                 console.error(err);
-                res.status(500).send('Error saving the product');
+                if (err === 'INVALID_DATA')
+                res.status(422).json({
+                  validationErrors
+                });
+                else res.status(500).send('Error saving the product');
             });
-    // }
+    }
 
 });
 

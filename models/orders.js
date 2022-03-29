@@ -4,12 +4,26 @@ const connection = require("../db-config");
 const db = connection.promise();
 
 const total = () =>
-db.query('SELECT SUM(TotalAmount) as total FROM orders')
-.then(([results]) => results[0]);
+    db.query('SELECT SUM(TotalAmount) as total FROM orders')
+    .then(([results]) => results[0]);
 
 const totalOrders = () =>
-db.query('SELECT COUNT(OrderID) as totalOrders from orders')
-.then(([results]) => results[0]);
+    db.query('SELECT COUNT(OrderID) as totalOrders from orders')
+    .then(([results]) => results[0]);
+
+const findForUser = (user) => {
+    return db
+        .query('SELECT o.OrderId, concat(p.sku, "-", p.name) as product,\
+         concat(u.firstname," ", u.lastname) as name, l.quantity, l.price * l.quantity as amount,\
+         s.statusdate as OrderDate\
+        FROM orders o\
+        JOIN orderline l on l.orderid=o.orderid\
+        JOIN products p on p.productid=l.productid\
+        JOIN users u on u.id=o.userid \
+        JOIN orderstatus s on s.orderid=o.orderid and s.stateid=1\
+        WHERE o.userid=?', [user])
+        .then(([results]) => results);
+}
 
 const findMany = () => {
     return db
@@ -58,9 +72,10 @@ SELECT o.OrderId, concat(p.sku,"-", p.name) as product, concat(u.firstname," ", 
 
 */
 module.exports = {
+    findForUser,
+    findMany,
     total,
     totalOrders,
-    findMany,
     // findOne,
     // create,
     // update,

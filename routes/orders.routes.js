@@ -31,6 +31,13 @@ router.get('/total_orders', (req, res) =>
     })
 )
 
+router.get('/user/:id', (req, res) =>
+    Orders.findForUser(req.params.id)
+    .then(rows => { res.json(rows) })
+    .catch(err => {
+        res.status(500).send('Error retrieving orders for user from database');
+    })
+);
 
 // router.get('/:id', (req, res) =>
 //     Users.findOne(req.params.id)

@@ -4,12 +4,18 @@ const connection = require("../db-config");
 const db = connection.promise();
 
 const total = () =>
-    db.query('SELECT SUM(TotalAmount) as total FROM orders')
+    db.query('SELECT SUM(TotalAmount) AS total FROM orders')
     .then(([results]) => results[0]);
 
 const totalOrders = () =>
-    db.query('SELECT COUNT(OrderID) as totalOrders from orders')
+    db.query('SELECT COUNT(OrderID) AS totalOrders from orders')
     .then(([results]) => results[0]);
+
+// const lastMonthSales =  () =>
+//     db.query('SELECT SUM(TotalAmount) AS lms FROM OrderStatus AS os,\
+//         JOIN orders AS o ON os.OrderID=o.OrderID,\
+//         JOIN calendar AS c ON c.db_date=os.StatusDate,\
+//         WHERE MONTH(date_format(curdate(),'%M'))-1');
 
 const findForUser = (user) => {
     return db

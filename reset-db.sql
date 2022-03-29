@@ -22,6 +22,8 @@ DROP TABLE IF EXISTS presentation;
 DROP TABLE IF EXISTS products;
 DROP TABLE IF EXISTS ingredients;
 DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS calendar;
+DROP PROCEDURE IF EXISTS fill_calendar;
 
 CREATE TABLE orders (
     OrderID int  NOT NULL PRIMARY KEY,
@@ -89,6 +91,22 @@ CREATE TABLE users (
     Address3 varchar(80) NULL,
     postCode int NOT NULL,
     city varchar(80) NOT NULL
+);
+
+CREATE TABLE calendar (
+        id                      INTEGER PRIMARY KEY,  -- year*10000+month*100+day
+        db_date                 DATE NOT NULL,
+        year                    INTEGER NOT NULL,
+        month                   INTEGER NOT NULL, -- 1 to 12
+        day                     INTEGER NOT NULL, -- 1 to 31
+        quarter                 INTEGER NOT NULL, -- 1 to 4
+        week                    INTEGER NOT NULL, -- 1 to 52/53
+        day_name                VARCHAR(9) NOT NULL, -- 'Monday', 'Tuesday'...
+        month_name              VARCHAR(9) NOT NULL, -- 'January', 'February'...
+        weekend_flag            CHAR(1) DEFAULT 'f' CHECK (weekend_flag in ('t', 'f')),
+        UNIQUE td_ymd_idx (year,month,day),
+        UNIQUE td_dbdate_idx (db_date)
+
 );
 
 ALTER TABLE orders ADD CONSTRAINT fk_Order_UserID FOREIGN KEY(UserID)
@@ -161,12 +179,12 @@ INSERT INTO OrderStatus(OrderID, StateID, StatusDate) VALUES
 (1, 1, '20220120'),
 (1, 2, '20220120'),
 (1, 3, '20220120'),
-(2, 1, '20220125'),
-(2, 2, '20220125'),
-(3, 1, '20220125'),
-(4, 1, '20220126'),
-(5, 1, '20220131'),
-(5, 2, '20220201')
+(2, 1, '20220216'),
+(2, 2, '20220217'),
+(3, 1, '20220217'),
+(4, 1, '20220218'),
+(5, 1, '20220219'),
+(5, 2, '20220220')
 ;
 
 INSERT INTO orders(OrderID, UserID, TotalAmount, OrderStatusID, UserComments) VALUES
@@ -180,9 +198,36 @@ INSERT INTO orders(OrderID, UserID, TotalAmount, OrderStatusID, UserComments) VA
 INSERT INTO OrderLine (OrderID, ProductID, Quantity, Price) VALUES
 (1, 1, 1,  17),
 (2, 3, 1,  34),
-(2, 1, 2,  17),
+(2, 1, 2,  17), 
 (3, 4, 5,  20),
 (4, 4, 1,  20),
 (5, 2, 1,  21),
 (5, 4, 1,  20)
 ;
+
+DELIMITER //
+SET lc_time_names = 'fr_FR';
+CREATE PROCEDURE fill_calendar(IN startdate DATE,IN stopdate DATE)
+BEGIN
+    DECLARE currentdate DATE;
+    SET currentdate = startdate;
+    WHILE currentdate < stopdate DO
+        INSERT INTO calendar VALUES (
+                        YEAR(currentdate)*10000+MONTH(currentdate)*100 + DAY(currentdate), currentdate,
+                        YEAR(currentdate),
+                        MONTH(currentdate),
+                        DAY(currentdate),
+                        QUARTER(currentdate),
+                        WEEKOFYEAR(currentdate),
+                        DATE_FORMAT(currentdate,'%W'),
+                        DATE_FORMAT(currentdate,'%M'),
+                        CASE DAYOFWEEK(currentdate) WHEN 1 THEN 't' WHEN 7 then 't' ELSE 'f' END);
+        SET currentdate = ADDDATE(currentdate,INTERVAL 1 DAY);
+    END WHILE;
+END
+//
+DELIMITER ;
+
+TRUNCATE TABLE calendar;
+
+CALL fill_calendar('2022-01-01','2032-01-01');

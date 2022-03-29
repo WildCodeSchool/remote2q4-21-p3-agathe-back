@@ -3,28 +3,32 @@ const Joi = require('joi');
 
 const db = connection.promise();
 
-const validate = ({Name,
-    Price,
-    SKU,
-    Characteristic,
-    Description,
-    Ingredients_details}) => { return Joi.object({
-    Name: Joi.string().max(250).required(),
-    Price: Joi.number().max(999).required(),
-    SKU: Joi.string().max(13).uppercase().required(),
-    Characteristic: Joi.string().required(),
-    Description: Joi.string().required(),
-    Ingredients_details: Joi.string().required(),
-}).validate({
+const validate = ({
     Name,
     Price,
     SKU,
     Characteristic,
     Description,
     Ingredients_details
-}, {
-    abortEarly: false
-})};
+}) => {
+    return Joi.object({
+        Name: Joi.string().max(250).required(),
+        Price: Joi.number().max(999).required(),
+        SKU: Joi.string().max(13).uppercase().required(),
+        Characteristic: Joi.string().required(),
+        Description: Joi.string().required(),
+        Ingredients_details: Joi.string().required(),
+    }).validate({
+        Name,
+        Price,
+        SKU,
+        Characteristic,
+        Description,
+        Ingredients_details
+    }, {
+        abortEarly: false
+    })
+};
 
 const findMany = () => {
     return db

@@ -56,12 +56,16 @@ productsRouter.post('/', (req, res) => {
         error
     } = Products.validate(req.body);
     if (error) {
+        console.log(error.details)
         res.status(422).json({
             validationErrors: error.details
         });
     } else {
+        // begin transaction
         Products.create(value)
             .then((createdProducts) => {
+                // vérifier les infos ingredients ?
+                // insert into ingredients avec l'id du produit créé
                 res.status(201).json(createdProducts);
             })
             .catch((err) => {
@@ -69,7 +73,6 @@ productsRouter.post('/', (req, res) => {
                 res.status(500).send('Error saving the product');
             });
     }
-
 });
 
 productsRouter.put('/:id', (req, res) => {

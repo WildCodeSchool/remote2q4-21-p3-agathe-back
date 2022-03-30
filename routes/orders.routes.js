@@ -1,10 +1,10 @@
 const router = require("express").Router();
 const Joi = require('joi');
-const checkJwt = require('../middlewares/checkJwt')
+const { checkJwt, isAdmin } = require('../middlewares/checkJwt')
 const Orders = require('../models/orders');
 
-// router.get('/', checkJwt, (req, res) =>
-router.get('/', (req, res) =>
+// router.get('/', (req, res) =>
+router.get('/', checkJwt, isAdmin, (req, res) =>
     Orders.findMany()
     .then(orders => res.json(orders))
     .catch(err => {
@@ -63,35 +63,35 @@ router.get('/user/:id', (req, res) =>
 //     city: Joi.string().required()
 // })
 
-// router.post('/', async(req, res) => {
-//     // recup donnees requete
-//     const { value, error } = userSchema.validate(req.body);
-//     if (error) {
-//         console.log(error)
-//         return res.status(400).json(error);
-//     }
+router.post('/', async(req, res) => {
+    // recup donnees requete
+    const { value, error } = userSchema.validate(req.body);
+    if (error) {
+        console.log(error)
+        return res.status(400).json(error);
+    }
 
-//     // verifie si user existe
-//     // await permet d'etre sur d'avoir un retour de verif user
-//     const [
-//         [existingUser]
-//     ] = await Users.findUserByEmail(value.email);
-//     if (existingUser) {
-//         return res.status(409).json({
-//             message: "l'utilisateur existe deja",
-//         })
-//     }
+    // verifie si user existe
+    // await permet d'etre sur d'avoir un retour de verif user
+    const [
+        [existingUser]
+    ] = await Users.findUserByEmail(value.email);
+    if (existingUser) {
+        return res.status(409).json({
+            message: "l'utilisateur existe deja",
+        })
+    }
 
-//     // etape de l'encryptage
-//     const hashedPassword = await argon2.hash(value.password);
+    // etape de l'encryptage
+    const hashedPassword = await argon2.hash(value.password);
 
-//     await Users.insertUser(value.email, hashedPassword, value.FirstName, value.LastName,
-//         value.PhoneNumber, value.Address1, value.Address2, value.Address3,
-//         value.postCode, value.city);
+    await Users.insertUser(value.email, hashedPassword, value.FirstName, value.LastName,
+        value.PhoneNumber, value.Address1, value.Address2, value.Address3,
+        value.postCode, value.city);
 
-//     const jwtKey = generateJWT(value.email, 'ROLE_USER');
-//     return res.json({ credentials: jwtKey })
-// })
+    const jwtKey = generateJWT(value.email, 'ROLE_USER');
+    return res.json({ credentials: jwtKey })
+})
 
 // router.put('/:id', async(req, res) => {
 //     const userId = req.params.id;

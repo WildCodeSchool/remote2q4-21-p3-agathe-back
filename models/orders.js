@@ -7,15 +7,29 @@ const total = () =>
     db.query('SELECT SUM(TotalAmount) AS total FROM orders')
     .then(([results]) => results[0]);
 
-const totalOrders = () =>
+const totalOrders = () => 
     db.query('SELECT COUNT(OrderID) AS totalOrders from orders')
     .then(([results]) => results[0]);
 
-// const lastMonthSales =  () =>
-//     db.query('SELECT SUM(TotalAmount) AS lms FROM OrderStatus AS os,\
-//         JOIN orders AS o ON os.OrderID=o.OrderID,\
-//         JOIN calendar AS c ON c.db_date=os.StatusDate,\
-//         WHERE MONTH(date_format(curdate(),'%M'))-1');
+
+// const dailySales = () => {
+//     db.query('SELECT SUM(o.TotalAmount) AS ta\
+//     FROM Orders AS o\
+//     JOIN orderstatus AS s ON s.orderid=o.orderid and s.stateid=2\
+//     JOIN Calendar AS c ON c.db_date=s.StatusDate\
+//     JOIN OrderStates AS st ON st.ID=s.StateID\
+//     WHERE c.db_date = CURRENT_DATE()')
+// };
+
+const lastMonthSales =  () => 
+    db.query('SELECT SUM(o.totalamount) AS lastMonthSales\
+    FROM orders AS o\
+    JOIN orderstatus AS s ON s.orderid=o.orderid and s.stateid=2\
+    JOIN calendar AS oc ON oc.db_date=s.statusdate\
+    JOIN calendar AS c ON c.db_date=date_sub(curdate(), interval 1 month)\
+    WHERE oc.year=c.year AND oc.month=c.month')
+    .then(([results]) => results[0]);
+
 
 const findForUser = (user) => {
     return db
@@ -82,6 +96,7 @@ module.exports = {
     findMany,
     total,
     totalOrders,
+    lastMonthSales
     // findOne,
     // create,
     // update,

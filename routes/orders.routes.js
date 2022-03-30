@@ -18,7 +18,7 @@ router.get('/total', (req, res) =>
     .then(orders => res.json(orders))
     .catch(err => {
         console.log(err)
-        res.status(500).send('Erreur en cherchant le total des ventes dans la base de données')
+        res.status(500).send('Erreur en recherchant le montant des ventes dans la base de données')
     })
 )
 
@@ -27,7 +27,7 @@ router.get('/total_orders', (req, res) =>
     .then(orders => res.json(orders))
     .catch(err => {
         console.log(err)
-        res.status(500).send('Erreur en cherchant le total des commandes dans la base de données')
+        res.status(500).send('Erreur en recherchant le montant des commandes dans la base de données')
     })
 )
 
@@ -36,6 +36,24 @@ router.get('/user/:id', (req, res) =>
     .then(rows => { res.json(rows) })
     .catch(err => {
         res.status(500).send('Error retrieving orders for user from database');
+    })
+);
+
+// router.get('/total_orders/daily_sales', (req, res) =>
+//     Orders.dailySales()
+//     .then(orders => res.json(orders))
+//     .catch(err => {
+//         console.log(err)
+//         res.status(500).send('Erreur en recherchant le montant des commandes du jour')
+//     })
+// )
+
+router.get('/last_month_sales', (req, res) =>
+    Orders.lastMonthSales()
+    .then(orders => res.json(orders))
+    .catch(err => {
+        console.log(err)
+        res.status(500).send('Erreur en recherchant le montant des commandes du mois dernier')
     })
 );
 

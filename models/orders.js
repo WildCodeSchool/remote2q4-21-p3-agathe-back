@@ -21,6 +21,15 @@ const totalOrders = () =>
 //     WHERE c.db_date = CURRENT_DATE()')
 // };
 
+const lastWeekSales = () => 
+    db.query('SELECT SUM(o.totalamount) AS lastWeekSales\
+    FROM orders AS o\
+    JOIN orderstatus AS s ON s.orderid=o.orderid and s.stateid=2\
+    JOIN calendar AS oc ON oc.db_date=s.statusdate\
+    JOIN calendar AS c ON c.db_date=date_sub(curdate(), interval 1 WEEK)\
+    WHERE oc.year=c.year AND oc.week=c.week')
+    .then(([results]) => results[0]);
+
 const lastMonthSales =  () => 
     db.query('SELECT SUM(o.totalamount) AS lastMonthSales\
     FROM orders AS o\
@@ -29,7 +38,6 @@ const lastMonthSales =  () =>
     JOIN calendar AS c ON c.db_date=date_sub(curdate(), interval 1 month)\
     WHERE oc.year=c.year AND oc.month=c.month')
     .then(([results]) => results[0]);
-
 
 const findForUser = (user) => {
     return db
@@ -96,7 +104,8 @@ module.exports = {
     findMany,
     total,
     totalOrders,
-    lastMonthSales
+    lastMonthSales,
+    lastWeekSales
     // findOne,
     // create,
     // update,

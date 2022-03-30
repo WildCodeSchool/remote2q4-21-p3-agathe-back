@@ -15,7 +15,7 @@ const findOne = (id) => {
         .then(([results]) => results[0]);
 };
 
-const create = ({ ProductID, Name, Description }) => {
+const create = (ProductID, Name, Description) => {
     return db
         .query("INSERT INTO ingredients (ProductID, Name, Description) VALUES (?, ?, ?)", [ProductID, Name, Description])
         .then(([results]) => {

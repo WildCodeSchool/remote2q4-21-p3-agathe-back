@@ -49,6 +49,20 @@ productsRouter.get('/count', (req, res) =>
         res.status(500).send('Erreur en cherchant le nombre des produits dans la base de données')
     })
 )
+const get_ingredients = (req) => {
+    // pattern of field name : ingredient-i-field
+    // field: Name or Description
+    let ingredients = [];
+    for (const key in req) {
+        if (key.startsWith('ingredient-')) {
+            const [x, i, field] = key.split('-');
+            if (!ingredients[i])
+                ingredients[i] = {}
+            ingredients[i][field] = req[key].trim()
+        }
+    }
+    return ingredients.filter(item => item.name && item.description) // not empty
+}
 
 productsRouter.post('/', (req, res) => {
     const {

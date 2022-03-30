@@ -20,7 +20,8 @@ const findOne = (id) =>
 
 const findUserByEmail = (email) =>
     db
-    .query('SELECT * FROM users WHERE email=?', [email]);
+    .query('SELECT * FROM users WHERE email=?', [email])
+    .then(([results]) => results[0]);
 
 const insertUser = (email, password, FirstName, LastName, PhoneNumber,
         Address1, Address2, Address3, postCode, city) =>

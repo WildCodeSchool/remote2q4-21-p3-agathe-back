@@ -77,10 +77,15 @@ productsRouter.post('/', (req, res) => {
     } else {
         // begin transaction
         Products.create(value)
-            .then((createdProducts) => {
-                // vérifier les infos ingredients ?
-                // insert into ingredients avec l'id du produit créé
-                res.status(201).json(createdProducts);
+            .then((createdProduct) => {
+                let ingredients = get_ingredients(req.body);
+                for (let ingredient of ingredients) {
+                    Ingredients.create(createdProduct.ProductID,
+                    ingredient.name,
+                    ingredient.description)
+                }
+                
+                res.status(201).json(createdProduct);
             })
             .catch((err) => {
                 console.error(err);

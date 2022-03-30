@@ -17,7 +17,9 @@ const checkJwt = async(req, res, next) => {
 
         // Check if user exists
         const { email } = decodedToken;
-        const user = await User.findUserByEmail(email);
+        const [
+            [user]
+        ] = await User.findUserByEmail(email);
         if (!user) {
             return res.status(401).json({
                 message: `User ${email} not exists`

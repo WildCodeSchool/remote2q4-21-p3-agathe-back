@@ -5,31 +5,33 @@ const db = connection.promise();
 
 const count = () =>
     db.query('SELECT count(*) as count FROM products')
-        .then(([results]) => results[0]);
+    .then(([results]) => results[0]);
 
-const validate = ({ Name,
+const validate = ({
+    Name,
     Price,
     SKU,
     Characteristic,
     Description,
-    Ingredients_details }) => {
-        return Joi.object({
-            Name: Joi.string().max(250).required(),
-            Price: Joi.number().max(999).required(),
-            SKU: Joi.string().max(13).uppercase().required(),
-            Characteristic: Joi.string().required(),
-            Description: Joi.string().required(),
-            Ingredients_details: Joi.string().required(),
-        }).validate({
-            Name,
-            Price,
-            SKU,
-            Characteristic,
-            Description,
-            Ingredients_details
-        }, {
-            abortEarly: false
-        })
+    Ingredients_details
+}) => {
+    return Joi.object({
+        Name: Joi.string().max(250).required(),
+        Price: Joi.number().max(999).required(),
+        SKU: Joi.string().max(13).uppercase().required(),
+        Characteristic: Joi.string().required(),
+        Description: Joi.string().required(),
+        Ingredients_details: Joi.string().required(),
+    }).validate({
+        Name,
+        Price,
+        SKU,
+        Characteristic,
+        Description,
+        Ingredients_details
+    }, {
+        abortEarly: false
+    })
 };
 
 const findMany = () => {
@@ -45,7 +47,6 @@ const findOne = (id) => {
 };
 
 const create = ({
-    ProductID,
     Name,
     Price,
     SKU,
@@ -54,11 +55,10 @@ const create = ({
     Ingredients_details
 }) => {
     return db
-        .query("INSERT INTO products (ProductID, Name, Price, SKU, Characteristic , Description, Ingredients_details) VALUES (?, ?, ?, ?, ?, ?, ?)", [ProductID, Name, Price, SKU, Characteristic, Description, Ingredients_details])
+        .query("INSERT INTO products (Name, Price, SKU, Characteristic , Description, Ingredients_details) VALUES (?, ?, ?, ?, ?, ?)", [Name, Price, SKU, Characteristic, Description, Ingredients_details])
         .then(([results]) => {
-            const id = results.insertID;
+            const ProductID = results.insertId;
             return {
-                id,
                 ProductID,
                 Name,
                 Price,

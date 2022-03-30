@@ -57,6 +57,15 @@ router.get('/last_month_sales', (req, res) =>
     })
 );
 
+router.get('/last_week_sales', (req, res) =>
+    Orders.lastWeekSales()
+    .then(orders => res.json(orders))
+    .catch(err => {
+        console.log(err)
+        res.status(500).send('Erreur en recherchant le montant des commandes de la semaine dernière')
+    })
+);
+
 // router.get('/:id', (req, res) =>
 //     Users.findOne(req.params.id)
 //     .then(user => {

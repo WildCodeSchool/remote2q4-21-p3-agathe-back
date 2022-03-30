@@ -12,14 +12,18 @@ const totalOrders = () =>
     .then(([results]) => results[0]);
 
 
-// const dailySales = () => {
-//     db.query('SELECT SUM(o.TotalAmount) AS ta\
-//     FROM Orders AS o\
-//     JOIN orderstatus AS s ON s.orderid=o.orderid and s.stateid=2\
-//     JOIN Calendar AS c ON c.db_date=s.StatusDate\
-//     JOIN OrderStates AS st ON st.ID=s.StateID\
-//     WHERE c.db_date = CURRENT_DATE()')
-// };
+const dailySales = () =>
+    db.query('SELECT SUM(o.TotalAmount) AS DailySales\
+    FROM Orders AS o\
+    JOIN orderstatus AS s ON s.orderid=o.orderid and s.stateid=2\
+    WHERE s.StatusDate = CURRENT_DATE()');
+
+const yesterdaySales = () =>
+    db.query('SELECT SUM(o.TotalAmount) AS YesterdaySales\
+    FROM Orders AS o\
+    JOIN orderstatus AS s ON s.orderid=o.orderid and s.stateid=2\
+    WHERE s.statusdate = subdate(current_date, 1)')
+    .then(([results]) => results[0]);
 
 const lastWeekSales = () => 
     db.query('SELECT SUM(o.totalamount) AS lastWeekSales\
@@ -105,7 +109,9 @@ module.exports = {
     total,
     totalOrders,
     lastMonthSales,
-    lastWeekSales
+    lastWeekSales,
+    dailySales,
+    yesterdaySales
     // findOne,
     // create,
     // update,

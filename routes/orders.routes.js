@@ -39,14 +39,14 @@ router.get('/user/:id', (req, res) =>
     })
 );
 
-// router.get('/total_orders/daily_sales', (req, res) =>
-//     Orders.dailySales()
-//     .then(orders => res.json(orders))
-//     .catch(err => {
-//         console.log(err)
-//         res.status(500).send('Erreur en recherchant le montant des commandes du jour')
-//     })
-// )
+router.get('/daily_sales', (req, res) =>
+    Orders.dailySales()
+    .then(orders => res.json(orders))
+    .catch(err => {
+        console.log(err)
+        res.status(500).send('Erreur en recherchant le montant des commandes du jour')
+    })
+)
 
 router.get('/last_month_sales', (req, res) =>
     Orders.lastMonthSales()
@@ -63,6 +63,15 @@ router.get('/last_week_sales', (req, res) =>
     .catch(err => {
         console.log(err)
         res.status(500).send('Erreur en recherchant le montant des commandes de la semaine dernière')
+    })
+);
+
+router.get('/yesterday_sales', (req, res) =>
+    Orders.yesterdaySales()
+    .then(orders => res.json(orders))
+    .catch(err => {
+        console.log(err)
+        res.status(500).send("Erreur en recherchant le montant des commandes de la journée d'hier")
     })
 );
 

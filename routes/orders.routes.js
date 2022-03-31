@@ -2,8 +2,8 @@ const router = require("express").Router();
 const Joi = require('joi');
 const { checkJwt, isAdmin } = require('../middlewares/checkJwt')
 const Orders = require('../models/orders');
+const OrdersStatus = require('../models/ordersStatus');
 
-// router.get('/', (req, res) =>
 router.get('/', checkJwt, isAdmin, (req, res) =>
     Orders.findMany()
     .then(orders => res.json(orders))
@@ -99,34 +99,35 @@ router.get('/yesterday_sales', (req, res) =>
 //     city: Joi.string().required()
 // })
 
-router.post('/', async(req, res) => {
+router.post('/', checkJwt, (req, res) => {
     // recup donnees requete
-    const { value, error } = userSchema.validate(req.body);
-    if (error) {
-        console.log(error)
-        return res.status(400).json(error);
-    }
+    // const { value, error } = userSchema.validate(req.body);
+    // if (error) {
+    //     console.log(error)
+    //     return res.status(400).json(error);
+    // }
+    const UserID = req.user.UserID
+    const { TotalAmount } = req.body
 
-    // verifie si user existe
-    // await permet d'etre sur d'avoir un retour de verif user
-    const [
-        [existingUser]
-    ] = await Users.findUserByEmail(value.email);
-    if (existingUser) {
-        return res.status(409).json({
-            message: "l'utilisateur existe deja",
+    // vérifier totalamount
+
+    Orders.create(UserID, TotalAmount, OrderStatusID = 1)
+        .then(order => {
+            // add status
+            let OrderID = order.OrderID
+            let StateID = 1
+            let StatusDate = new Date()
+            OrdersStatus.create({ OrderID, StateID, StatusDate })
+                // add lines
+            for (let line of req.body.lines)
+                OrdersLine.create({ OrderID, ProductID, Quantity, Price })
+
+            res.json(order)
         })
-    }
-
-    // etape de l'encryptage
-    const hashedPassword = await argon2.hash(value.password);
-
-    await Users.insertUser(value.email, hashedPassword, value.FirstName, value.LastName,
-        value.PhoneNumber, value.Address1, value.Address2, value.Address3,
-        value.postCode, value.city);
-
-    const jwtKey = generateJWT(value.email, 'ROLE_USER');
-    return res.json({ credentials: jwtKey })
+        .catch(err => {
+            console.log(err)
+            res.status(500).send('Erreur en recherchant le montant des commandes de la semaine dernière')
+        })
 })
 
 // router.put('/:id', async(req, res) => {

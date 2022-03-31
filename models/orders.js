@@ -7,7 +7,7 @@ const total = () =>
     db.query('SELECT SUM(TotalAmount) AS total FROM orders')
     .then(([results]) => results[0]);
 
-const totalOrders = () => 
+const totalOrders = () =>
     db.query('SELECT COUNT(OrderID) AS totalOrders from orders')
     .then(([results]) => results[0]);
 
@@ -16,7 +16,8 @@ const dailySales = () =>
     db.query('SELECT SUM(o.TotalAmount) AS DailySales\
     FROM Orders AS o\
     JOIN orderstatus AS s ON s.orderid=o.orderid and s.stateid=2\
-    WHERE s.StatusDate = CURRENT_DATE()');
+    WHERE s.StatusDate = CURRENT_DATE()')
+    .then(([results]) => results[0]);
 
 const yesterdaySales = () =>
     db.query('SELECT SUM(o.TotalAmount) AS YesterdaySales\
@@ -25,7 +26,7 @@ const yesterdaySales = () =>
     WHERE s.statusdate = subdate(current_date, 1)')
     .then(([results]) => results[0]);
 
-const lastWeekSales = () => 
+const lastWeekSales = () =>
     db.query('SELECT SUM(o.totalamount) AS lastWeekSales\
     FROM orders AS o\
     JOIN orderstatus AS s ON s.orderid=o.orderid and s.stateid=2\
@@ -34,14 +35,17 @@ const lastWeekSales = () =>
     WHERE oc.year=c.year AND oc.week=c.week')
     .then(([results]) => results[0]);
 
-const lastMonthSales =  () => 
-    db.query('SELECT SUM(totalamount) AS lastMonthSales\
+const lastMonthSales = () =>
+    db.query('SELECT SUM(o.totalamount) AS lastMonthSales\
     FROM orders AS o\
     JOIN orderstatus AS s ON s.orderid=o.orderid and s.stateid=2\
     JOIN calendar AS oc ON oc.db_date=s.statusdate\
     JOIN calendar AS c ON c.db_date=date_sub(curdate(), interval 1 month)\
     WHERE oc.year=c.year AND oc.month=c.month')
     .then(([results]) => results[0]);
+
+const yearSales = () =>
+    debugger.query('SELECT')
 
 const findForUser = (user) => {
     return db
@@ -76,34 +80,29 @@ const findMany = () => {
 //         .then(([results]) => results[0]);
 // };
 
-// const create = ({ ProductID, Name, Description }) => {
-//     return db
-//         .query("INSERT INTO ingredients (ProductID, Name, Description) VALUES (?, ?, ?)", [ProductID, Name, Description])
-//         .then(([results]) => {
-//             const id = results.insertID;
-//             return { id, ProductID, Name, Description };
-//         });
-// };
+const create = ({ UserID, TotalAmount, OrderStatusID }) => {
+    // que fait on de UserComments ? Utile ?
+    console.log(`Orders.create(${UserID}, ${TotalAmount}, ${OrderStatusID})`)
+    return db
+        .query("INSERT INTO orders(UserID, TotalAmount, OrderStatusID) VALUES (?, ?, ?)", [ProductID, Name, Description])
+        .then(([results]) => {
+            const OrderID = results.insertID;
+            return { OrderID, UserID, TotalAmount, OrderStatusID };
+        });
+};
 
-// const update = (id, newAttributes) => {
-//     return db.query('UPDATE ingredients SET ? WHERE id = ?', [newAttributes, id]);
-// };
+const update = (id, newAttributes) => {
+    return db.query('UPDATE orders SET ? WHERE OrderID = ?', [newAttributes, id]);
+};
 
 // const destroy = (id) => {
 //     return db
 //         .query('DELETE FROM ingredients WHERE id = ?', [id])
 //         .then(([result]) => result.affectedRows !== 0);
 // };
-/*
 
-SELECT o.OrderId, concat(p.sku,"-", p.name) as product, concat(u.firstname," ", u.lastname) as name, o.totalamount
-        from orders o
-        join orderline l on l.orderid=o.orderid
-        join products p on p.productid=l.productid
-        join users u on u.id=o.userid
-
-*/
 module.exports = {
+    create,
     findForUser,
     findMany,
     total,
@@ -113,7 +112,6 @@ module.exports = {
     dailySales,
     yesterdaySales
     // findOne,
-    // create,
     // update,
     // destroy
 };

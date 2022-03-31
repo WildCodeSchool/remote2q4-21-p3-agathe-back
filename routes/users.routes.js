@@ -3,8 +3,9 @@ const Joi = require('joi');
 const argon2 = require('argon2');
 const {
     generateJWT
-} = require('../utils/auth')
-const checkJwt = require('../middlewares/checkJwt')
+} = require('../utils/auth');
+const { checkJwt } = require('../middlewares/checkJwt');
+const Orders = require('../models/orders');
 const Users = require('../models/users');
 
 // router.get('/', checkJwt, (req, res) =>
@@ -39,7 +40,7 @@ router.get('/:id', (req, res) =>
 
 router.get('/:id/orders', checkJwt, (req, res) => {
     let UserId;
-    if (req.params.id === 0) {
+    if (req.params.id === '0') {
         UserId = req.user.id
     } else UserId = req.params.id
     return Orders.findForUser(UserId)

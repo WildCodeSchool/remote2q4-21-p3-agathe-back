@@ -9,11 +9,13 @@
 SET NAMES utf8;
 
 ALTER TABLE Orders DROP FOREIGN KEY fk_Order_UserID;
-ALTER TABLE Orders DROP FOREIGN KEY fk_Order_OrderStatusID;
+ALTER TABLE Orders DROP FOREIGN KEY fk_Order_OrderStatusID; // to delete
+ALTER TABLE Orders DROP FOREIGN KEY fk_Order_status_id;
 ALTER TABLE OrderLine DROP FOREIGN KEY fk_OrderLine_OrderID;
 ALTER TABLE OrderLine DROP FOREIGN KEY fk_OrderLine_ProductID;
 ALTER TABLE Ingredients DROP FOREIGN KEY fk_Ingredients_ProductID;
 
+DROP VIEW IF EXISTS orders_header;
 DROP TABLE IF EXISTS orders;
 DROP TABLE IF EXISTS OrderLine;
 DROP TABLE IF EXISTS OrderStates;
@@ -26,10 +28,10 @@ DROP TABLE IF EXISTS calendar;
 DROP PROCEDURE IF EXISTS fill_calendar;
 
 CREATE TABLE orders (
-    OrderID int  NOT NULL PRIMARY KEY AUTO_INCREMENT,
-    UserID int  NOT NULL,
+    OrderID int NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    UserID int NOT NULL,
     TotalAmount decimal(8,2) NOT NULL,
-    OrderStatusID int  NOT NULL
+    status_id int NOT NULL
 );
 
 CREATE TABLE OrderLine (
@@ -93,16 +95,16 @@ CREATE TABLE users (
 );
 
 CREATE TABLE calendar (
-    id                      INTEGER PRIMARY KEY,  -- year*10000+month*100+day
-    db_date                 DATE NOT NULL,
-    year                    INTEGER NOT NULL,
-    month                   INTEGER NOT NULL, -- 1 to 12
-    day                     INTEGER NOT NULL, -- 1 to 31
-    quarter                 INTEGER NOT NULL, -- 1 to 4
-    week                    INTEGER NOT NULL, -- 1 to 52/53
-    day_name                VARCHAR(9) NOT NULL, -- 'Monday', 'Tuesday'...
-    month_name              VARCHAR(9) NOT NULL, -- 'January', 'February'...
-    weekend_flag            CHAR(1) DEFAULT 'f' CHECK (weekend_flag in ('t', 'f')),
+    id           INTEGER PRIMARY KEY,  -- year*10000+month*100+day
+    db_date      DATE NOT NULL,
+    year         INTEGER NOT NULL,
+    month        INTEGER NOT NULL, -- 1 to 12
+    day          INTEGER NOT NULL, -- 1 to 31
+    quarter      INTEGER NOT NULL, -- 1 to 4
+    week         INTEGER NOT NULL, -- 1 to 52/53
+    day_name     VARCHAR(9) NOT NULL, -- 'Monday', 'Tuesday'...
+    month_name   VARCHAR(9) NOT NULL, -- 'January', 'February'...
+    weekend_flag CHAR(1) DEFAULT 'f' CHECK (weekend_flag in ('t', 'f')),
     UNIQUE td_ymd_idx (year,month,day),
     UNIQUE td_dbdate_idx (db_date)
 );
@@ -110,8 +112,8 @@ CREATE TABLE calendar (
 ALTER TABLE orders ADD CONSTRAINT fk_Order_UserID FOREIGN KEY(UserID)
 REFERENCES users(ID);
 
-ALTER TABLE orders ADD CONSTRAINT fk_Order_OrderStatusID FOREIGN KEY(OrderStatusID)
-REFERENCES OrderStatus(OrderStatusID);
+ALTER TABLE orders ADD CONSTRAINT fk_Order_status_id FOREIGN KEY(status_id)
+REFERENCES OrderStates(id);
 
 ALTER TABLE OrderLine ADD CONSTRAINT fk_OrderLine_OrderID FOREIGN KEY(OrderID)
 REFERENCES orders(OrderID);
@@ -127,6 +129,22 @@ ON users(FirstName);
 
 CREATE INDEX idx_User_LastName
 ON users(LastName);
+
+CREATE VIEW orders_header as
+SELECT o.orderid, o.totalamount as total_amount,
+    u.id as user_id, u.firstname as first_name, u.lastname as last_name, u.email,
+    sc.statusdate as creation_date,
+    sp.statusdate as payment_date,
+    se.statusdate as expedition_date,
+    s.statusdate as date, os.id as status_id, os.state
+FROM orders AS o
+    JOIN orderstatus AS s ON s.orderid=o.orderid and o.status_id=s.stateid
+    JOIN orderstatus AS sc ON sc.orderid=o.orderid and sc.stateid=1
+    LEFT JOIN orderstatus AS sp ON sp.orderid=o.orderid and sp.stateid=2
+    LEFT JOIN orderstatus AS se ON se.orderid=o.orderid and se.stateid=3
+    JOIN orderstates os ON os.id=o.status_id
+    JOIN users AS u on u.id=o.userid
+;
 
 -- PRESENTATION
 INSERT INTO Presentation(presentation)
@@ -174,23 +192,24 @@ INSERT INTO OrderStates(id, state) VALUES
 ;
 
 INSERT INTO OrderStatus(OrderID, StateID, StatusDate) VALUES
-(1, 1, '20220120'),
-(1, 2, '20220120'),
-(1, 3, '20220120'),
-(2, 1, '20220216'),
-(2, 2, '20220217'),
-(3, 1, '20220217'),
-(4, 1, '20220218'),
-(5, 1, '20220219'),
-(5, 2, '20220220')
+(1, 1, '20220220'),
+(1, 2, '20220220'),
+(1, 3, '20220220'),
+(2, 1, '20220316'),
+(2, 2, '20220317'),
+(3, 1, '20220317'),
+(4, 1, '20220318'),
+(4, 2, '20220324'),
+(5, 1, '20220324'),
+(5, 2, '20220330')
 ;
 
-INSERT INTO orders(OrderID, UserID, TotalAmount, OrderStatusID) VALUES
-(1, 3,  17, 1),
+INSERT INTO orders(OrderID, UserID, TotalAmount, status_id) VALUES
+(1, 3,  17, 3),
 (2, 4,  68, 2),
-(3, 5, 100, 3),
-(4, 3,  20, 4),
-(5, 5,  41, 5)
+(3, 5, 100, 1),
+(4, 3,  20, 2),
+(5, 5,  41, 2)
 ;
 
 INSERT INTO OrderLine (OrderID, ProductID, Quantity, Price) VALUES

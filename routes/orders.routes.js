@@ -23,8 +23,8 @@ router.get('/total', (req, res) =>
     })
 )
 
-router.get('/total_orders', (req, res) =>
-    Orders.totalOrders()
+router.get('/count', (req, res) =>
+    Orders.count()
     .then(orders => res.json(orders))
     .catch(err => {
         console.log(err)
@@ -35,14 +35,12 @@ router.get('/total_orders', (req, res) =>
 router.get('/user/:id', (req, res) =>
     Orders.findForUser(req.params.id)
     .then(rows => { res.json(rows) })
-    .catch(err => {
-        res.status(500).send('Error retrieving orders for user from database');
-    })
+    .catch(err => res.status(500).send('Error retrieving orders for user from database'))
 );
 
 router.get('/daily_sales', (req, res) =>
     Orders.dailySales()
-    .then(orders => res.json(orders))
+    .then(sales => res.json(sales))
     .catch(err => {
         console.log(err)
         res.status(500).send('Erreur en recherchant le montant des commandes du jour')
@@ -114,7 +112,8 @@ router.post('/', checkJwt, (req, res) => {
     );
 
     // vérifier total amount
-    Orders.create({ UserID, TotalAmount, OrderStatusID: 1 })
+
+    Orders.create({ UserID, TotalAmount, status_id: 1 })
         .then(order => {
             // add status
             let OrderID = order.OrderID

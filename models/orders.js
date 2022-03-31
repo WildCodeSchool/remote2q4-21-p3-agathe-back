@@ -11,37 +11,73 @@ const totalOrders = () =>
     db.query('SELECT COUNT(OrderID) AS totalOrders from orders')
     .then(([results]) => results[0]);
 
+// SELECT SUM(o.TotalAmount) AS DailySales
+// FROM Orders AS o
+// JOIN orderstatus AS s ON s.orderid=o.orderid and s.stateid=2
+// WHERE s.StatusDate = CURRENT_DATE()
 
-const dailySales = () =>
+
+// SELECT coalesce(SUM(o.total_amount), 0) AS DailySales
+// FROM Orders_header AS o
+// WHERE o.payment_date = CURRENT_DATE()
+
+const dailySales = () => {
+
     db.query('SELECT SUM(o.TotalAmount) AS DailySales\
     FROM Orders AS o\
     JOIN orderstatus AS s ON s.orderid=o.orderid and s.stateid=2\
     WHERE s.StatusDate = CURRENT_DATE()');
+}
 
-const yesterdaySales = () =>
-    db.query('SELECT SUM(o.TotalAmount) AS YesterdaySales\
-    FROM Orders AS o\
-    JOIN orderstatus AS s ON s.orderid=o.orderid and s.stateid=2\
-    WHERE s.statusdate = subdate(current_date, 1)')
-    .then(([results]) => results[0]);
+const yesterdaySales = () => {
+    // db.query('SELECT SUM(o.TotalAmount) AS YesterdaySales\
+    // FROM Orders AS o\
+    // JOIN orderstatus AS s ON s.orderid=o.orderid and s.stateid=2\
+    // WHERE s.statusdate = subdate(current_date, 1)')
+    let select = '\
+    SELECT SUM(o.total_amount) AS YesterdaySales\
+    FROM orders_header AS o\
+    WHERE o.payment_date = subdate(current_date, 1'
+    return db
+        .query(select)
+        .then(([results]) => results[0]);
+}
 
-const lastWeekSales = () =>
-    db.query('SELECT SUM(o.totalamount) AS lastWeekSales\
-    FROM orders AS o\
-    JOIN orderstatus AS s ON s.orderid=o.orderid and s.stateid=2\
-    JOIN calendar AS oc ON oc.db_date=s.statusdate\
-    JOIN calendar AS c ON c.db_date=date_sub(curdate(), interval 1 WEEK)\
-    WHERE oc.year=c.year AND oc.week=c.week')
-    .then(([results]) => results[0]);
+const lastWeekSales = () => {
+    // db.query('SELECT SUM(o.totalamount) AS lastWeekSales\
+    // FROM orders AS o\
+    // JOIN orderstatus AS s ON s.orderid=o.orderid and s.stateid=2\
+    // JOIN calendar AS oc ON oc.db_date=s.statusdate\
+    // JOIN calendar AS c ON c.db_date=date_sub(curdate(), interval 1 WEEK)\
+    // WHERE oc.year=c.year AND oc.week=c.week')
+    let select = '\
+    SELECT SUM(o.total_amount) AS lastWeekSales\
+    FROM orders_header AS o \
+        JOIN calendar oc on oc.db_date=o.payment_date\
+        JOIN calendar AS c ON c.db_date=date_sub(curdate(), interval 1 WEEK) \
+    WHERE oc.year=c.year AND oc.week=c.week'
+    return db
+        .query(select)
+        .then(([results]) => results[0]);
+}
 
-const lastMonthSales = () =>
-    db.query('SELECT SUM(o.totalamount) AS lastMonthSales\
-    FROM orders AS o\
-    JOIN orderstatus AS s ON s.orderid=o.orderid and s.stateid=2\
-    JOIN calendar AS oc ON oc.db_date=s.statusdate\
-    JOIN calendar AS c ON c.db_date=date_sub(curdate(), interval 1 month)\
-    WHERE oc.year=c.year AND oc.month=c.month')
-    .then(([results]) => results[0]);
+const lastMonthSales = () => {
+    // db.query('SELECT SUM(o.totalamount) AS lastMonthSales\
+    // FROM orders AS o\
+    // JOIN orderstatus AS s ON s.orderid=o.orderid and s.stateid=2\
+    // JOIN calendar AS oc ON oc.db_date=s.statusdate\
+    // JOIN calendar AS c ON c.db_date=date_sub(curdate(), interval 1 month)\
+    // WHERE oc.year=c.year AND oc.month=c.month')
+    let select = '\
+    SELECT SUM(o.total_amount) AS lastMonthSales\
+    FROM orders_header AS o\
+        JOIN calendar oc on oc.db_date=o.payment_date\
+        JOIN calendar AS c ON c.db_date = date_sub(curdate(), interval 1 month)\
+    WHERE oc.year = c.year AND oc.month = c.month'
+    return db
+        .query(select)
+        .then(([results]) => results[0]);
+}
 
 const findForUser = (user) => {
     return db
@@ -76,14 +112,14 @@ const findMany = () => {
 //         .then(([results]) => results[0]);
 // };
 
-const create = ({ UserID, TotalAmount, OrderStatusID }) => {
-    // console.log(`Orders.create(${UserID}, ${TotalAmount}, ${OrderStatusID})`)
+const create = ({ UserID, TotalAmount, status_id }) => {
+    // console.log(`Orders.create(${UserID}, ${TotalAmount}, ${status_id})`)
     return db
-        .query("INSERT INTO orders(UserID, TotalAmount, OrderStatusID) VALUES (?, ?, ?)", [UserID, TotalAmount, OrderStatusID])
+        .query("INSERT INTO orders(UserID, TotalAmount, status_id) VALUES (?, ?, ?)", [UserID, TotalAmount, status_id])
         .then(([results]) => {
             // console.log(results)
             const OrderID = results.insertId;
-            return { OrderID, UserID, TotalAmount, OrderStatusID };
+            return { OrderID, UserID, TotalAmount, status_id };
         });
 };
 

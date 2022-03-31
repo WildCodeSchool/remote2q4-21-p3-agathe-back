@@ -3,6 +3,7 @@ const Joi = require('joi');
 const { checkJwt, isAdmin } = require('../middlewares/checkJwt')
 const Orders = require('../models/orders');
 const OrdersStatus = require('../models/ordersStatus');
+const OrdersLine = require('../models/ordersLine')
 
 router.get('/', checkJwt, isAdmin, (req, res) =>
     Orders.findMany()
@@ -106,21 +107,25 @@ router.post('/', checkJwt, (req, res) => {
     //     console.log(error)
     //     return res.status(400).json(error);
     // }
-    const UserID = req.user.UserID
-    const { TotalAmount } = req.body
+    const UserID = req.user.id
+    const TotalAmount = req.body.reduce(
+        (total, cartItem) => total + cartItem.quantity * cartItem.price,
+        0
+    );
 
     // vérifier totalamount
 
-    Orders.create(UserID, TotalAmount, OrderStatusID = 1)
+    Orders.create({ UserID, TotalAmount, OrderStatusID: 1 })
         .then(order => {
             // add status
             let OrderID = order.OrderID
             let StateID = 1
             let StatusDate = new Date()
             OrdersStatus.create({ OrderID, StateID, StatusDate })
-                // add lines
-            for (let line of req.body.lines)
-                OrdersLine.create({ OrderID, ProductID, Quantity, Price })
+
+            // add lines
+            for (let line of req.body)
+                OrdersLine.create({ OrderID, ProductID: line.ProductID, Quantity: line.quantity, Price: line.price })
 
             res.json(order)
         })

@@ -23,12 +23,12 @@ const db = connection.promise();
 // };
 
 const create = ({ OrderID, ProductID, Quantity, Price }) => {
-    console.log(`Orders.create(${OrderID}, ${StateID}, ${Quantity}, ${Price})`)
+    // console.log(`OrdersLine.create(${OrderID}, ${ProductID}, ${Quantity}, ${Price})`)
     return db
-        .query("INSERT INTO OrderStatus(OrderID, ProductID, Quantity, Price) VALUES (?, ?, ?, ?)", [OrderID, ProductID, Quantity, Price])
+        .query("INSERT INTO OrderLine(OrderID, ProductID, Quantity, Price) VALUES (?, ?, ?, ?)", [OrderID, ProductID, Quantity, Price])
         .then(([results]) => {
-            const OrderLineID = results.insertID;
-            return { OrderStatusID, OrderID, ProductID, Quantity, Price };
+            const OrderLineID = results.insertId;
+            return { OrderLineID, OrderID, ProductID, Quantity, Price };
         });
 }
 

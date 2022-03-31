@@ -48,6 +48,7 @@ const userSchema = Joi.object({
     city: Joi.string().required()
 })
 
+
 router.post('/', async(req, res) => {
     // recup donnees requete
     const { value, error } = userSchema.validate(req.body);

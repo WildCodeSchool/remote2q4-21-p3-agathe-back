@@ -113,8 +113,7 @@ router.post('/', checkJwt, (req, res) => {
         0
     );
 
-    // vérifier totalamount
-
+    // vérifier total amount
     Orders.create({ UserID, TotalAmount, OrderStatusID: 1 })
         .then(order => {
             // add status

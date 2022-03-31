@@ -77,12 +77,12 @@ const findMany = () => {
 // };
 
 const create = ({ UserID, TotalAmount, OrderStatusID }) => {
-    // que fait on de UserComments ? Utile ?
-    console.log(`Orders.create(${UserID}, ${TotalAmount}, ${OrderStatusID})`)
+    // console.log(`Orders.create(${UserID}, ${TotalAmount}, ${OrderStatusID})`)
     return db
-        .query("INSERT INTO orders(UserID, TotalAmount, OrderStatusID) VALUES (?, ?, ?)", [ProductID, Name, Description])
+        .query("INSERT INTO orders(UserID, TotalAmount, OrderStatusID) VALUES (?, ?, ?)", [UserID, TotalAmount, OrderStatusID])
         .then(([results]) => {
-            const OrderID = results.insertID;
+            // console.log(results)
+            const OrderID = results.insertId;
             return { OrderID, UserID, TotalAmount, OrderStatusID };
         });
 };

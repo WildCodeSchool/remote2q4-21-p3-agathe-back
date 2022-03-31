@@ -26,11 +26,10 @@ DROP TABLE IF EXISTS calendar;
 DROP PROCEDURE IF EXISTS fill_calendar;
 
 CREATE TABLE orders (
-    OrderID int  NOT NULL PRIMARY KEY,
+    OrderID int  NOT NULL PRIMARY KEY AUTO_INCREMENT,
     UserID int  NOT NULL,
     TotalAmount decimal(8,2) NOT NULL,
-    OrderStatusID int  NOT NULL,
-    UserComments text  NOT NULL
+    OrderStatusID int  NOT NULL
 );
 
 CREATE TABLE OrderLine (
@@ -43,7 +42,7 @@ CREATE TABLE OrderLine (
 
 CREATE TABLE OrderStatus (
     OrderStatusID int NOT NULL PRIMARY KEY AUTO_INCREMENT,
-    OrderId int not null,
+    OrderID int not null,
     StateID int not null,
     StatusDate date NOT NULL
 );
@@ -94,19 +93,18 @@ CREATE TABLE users (
 );
 
 CREATE TABLE calendar (
-        id                      INTEGER PRIMARY KEY,  -- year*10000+month*100+day
-        db_date                 DATE NOT NULL,
-        year                    INTEGER NOT NULL,
-        month                   INTEGER NOT NULL, -- 1 to 12
-        day                     INTEGER NOT NULL, -- 1 to 31
-        quarter                 INTEGER NOT NULL, -- 1 to 4
-        week                    INTEGER NOT NULL, -- 1 to 52/53
-        day_name                VARCHAR(9) NOT NULL, -- 'Monday', 'Tuesday'...
-        month_name              VARCHAR(9) NOT NULL, -- 'January', 'February'...
-        weekend_flag            CHAR(1) DEFAULT 'f' CHECK (weekend_flag in ('t', 'f')),
-        UNIQUE td_ymd_idx (year,month,day),
-        UNIQUE td_dbdate_idx (db_date)
-
+    id                      INTEGER PRIMARY KEY,  -- year*10000+month*100+day
+    db_date                 DATE NOT NULL,
+    year                    INTEGER NOT NULL,
+    month                   INTEGER NOT NULL, -- 1 to 12
+    day                     INTEGER NOT NULL, -- 1 to 31
+    quarter                 INTEGER NOT NULL, -- 1 to 4
+    week                    INTEGER NOT NULL, -- 1 to 52/53
+    day_name                VARCHAR(9) NOT NULL, -- 'Monday', 'Tuesday'...
+    month_name              VARCHAR(9) NOT NULL, -- 'January', 'February'...
+    weekend_flag            CHAR(1) DEFAULT 'f' CHECK (weekend_flag in ('t', 'f')),
+    UNIQUE td_ymd_idx (year,month,day),
+    UNIQUE td_dbdate_idx (db_date)
 );
 
 ALTER TABLE orders ADD CONSTRAINT fk_Order_UserID FOREIGN KEY(UserID)
@@ -187,12 +185,12 @@ INSERT INTO OrderStatus(OrderID, StateID, StatusDate) VALUES
 (5, 2, '20220220')
 ;
 
-INSERT INTO orders(OrderID, UserID, TotalAmount, OrderStatusID, UserComments) VALUES
-(1, 3,  17, 1, ''),
-(2, 4,  68, 2, 'Merci'),
-(3, 5, 100, 3, ''),
-(4, 3,  20, 4, ''),
-(5, 5,  41, 5, '')
+INSERT INTO orders(OrderID, UserID, TotalAmount, OrderStatusID) VALUES
+(1, 3,  17, 1),
+(2, 4,  68, 2),
+(3, 5, 100, 3),
+(4, 3,  20, 4),
+(5, 5,  41, 5)
 ;
 
 INSERT INTO OrderLine (OrderID, ProductID, Quantity, Price) VALUES

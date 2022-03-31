@@ -22,13 +22,13 @@ const db = connection.promise();
 //         .then(([results]) => results[0]);
 // };
 
-const create = ({ OrderId, StateID, StatusDate }) => {
-    console.log(`Orders.create(${OrderId}, ${StateID}, ${StatusDate})`)
+const create = ({ OrderID, StateID, StatusDate }) => {
+    // console.log(`OrderStatus.create(${OrderID}, ${StateID}, ${StatusDate})`)
     return db
-        .query("INSERT INTO OrderStatus(OrderId, StateID, StatusDate) VALUES (?, ?, ?)", [OrderId, StateID, StatusDate])
+        .query("INSERT INTO OrderStatus(OrderId, StateID, StatusDate) VALUES (?, ?, ?)", [OrderID, StateID, StatusDate])
         .then(([results]) => {
             const OrderStatusID = results.insertID;
-            return { OrderStatusID, OrderId, StateID, StatusDate };
+            return { OrderStatusID, OrderID, StateID, StatusDate };
         });
 }
 

@@ -35,7 +35,7 @@ const lastWeekSales = () =>
     .then(([results]) => results[0]);
 
 const lastMonthSales =  () => 
-    db.query('SELECT SUM(o.totalamount) AS lastMonthSales\
+    db.query('SELECT SUM(totalamount) AS lastMonthSales\
     FROM orders AS o\
     JOIN orderstatus AS s ON s.orderid=o.orderid and s.stateid=2\
     JOIN calendar AS oc ON oc.db_date=s.statusdate\

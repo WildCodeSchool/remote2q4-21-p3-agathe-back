@@ -1,7 +1,9 @@
 const router = require("express").Router();
 const Joi = require('joi');
 const argon2 = require('argon2');
-const { generateJWT } = require('../utils/auth')
+const {
+    generateJWT
+} = require('../utils/auth')
 const checkJwt = require('../middlewares/checkJwt')
 const Users = require('../models/users');
 
@@ -35,6 +37,18 @@ router.get('/:id', (req, res) =>
     })
 );
 
+router.get('/:id/orders', checkJwt, (req, res) => {
+    let UserId;
+    if (req.params.id === 0) {
+        UserId = req.user.id
+    } else UserId = req.params.id
+    return Orders.findForUser(UserId)
+        .then(rows => {
+            res.json(rows)
+        })
+        .catch(err => res.status(500).send('Error retrieving orders for user from database'))
+});
+
 const userSchema = Joi.object({
     email: Joi.string().email().required(),
     password: Joi.string().required(),
@@ -49,9 +63,12 @@ const userSchema = Joi.object({
 })
 
 
-router.post('/', async(req, res) => {
+router.post('/', async (req, res) => {
     // recup donnees requete
-    const { value, error } = userSchema.validate(req.body);
+    const {
+        value,
+        error
+    } = userSchema.validate(req.body);
     if (error) {
         console.log(error)
         return res.status(400).json(error);
@@ -76,18 +93,27 @@ router.post('/', async(req, res) => {
         value.postCode, value.city);
 
     const jwtKey = generateJWT(value.email, 'ROLE_USER');
-    return res.json({ credentials: jwtKey })
+    return res.json({
+        credentials: jwtKey
+    })
 })
 
-router.put('/:id', async(req, res) => {
+router.put('/:id', async (req, res) => {
     const userId = req.params.id;
     try {
         let existingUser = await Users.findOne(userId);
         if (!existingUser) throw new Error('RECORD_NOT_FOUND');
         // etape de l'encryptage
         const hashedPassword = await argon2.hash(req.body.password);
-        await Users.updateUser({...req.body, id: userId, password: hashedPassword });
-        res.status(200).json({...existingUser, ...req.body });
+        await Users.updateUser({
+            ...req.body,
+            id: userId,
+            password: hashedPassword
+        });
+        res.status(200).json({
+            ...existingUser,
+            ...req.body
+        });
     } catch (error) {
         console.error(err);
         if (err === 'RECORD_NOT_FOUND')

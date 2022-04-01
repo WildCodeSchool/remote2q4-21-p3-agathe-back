@@ -1,8 +1,11 @@
 const productsRouter = require("express").Router();
+const multer = require('multer');
 const Orders = require('../models/orders')
 const Products = require("../models/products");
 const Ingredients = require("../models/ingredients");
 const { checkJwt, isAdmin } = require('../middlewares/checkJwt')
+
+const upload = multer({ dest: '../assets'});
 
 productsRouter.get('/', (req, res) => {
     Products.findMany()
@@ -100,6 +103,16 @@ productsRouter.post('/', (req, res) => {
                 res.status(500).send('Error saving the product');
             });
     }
+});
+
+productsRouter.post('/', upload.single('picture'), async (req, res) => {
+    // const [{ insertId: id}] = await insertPost(req.body, req.file.path);
+
+    return res.json({
+        ...req.body,
+        id,
+        picture: req.file.filename
+    });
 });
 
 productsRouter.put('/:id', (req, res) => {

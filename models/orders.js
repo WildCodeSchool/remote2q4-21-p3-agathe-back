@@ -72,11 +72,11 @@ const lastMonthSales = () => {
 }
 
 const yearlySales = () => 
-    db.query("SELECT c.year, c.month, coalesce(sum(o.total_amount),0) AS total_amount\
+    db.query("SELECT c.year, c.month_name, coalesce(sum(o.total_amount),0) AS total_amount\
     from calendar c\
     left join orders_header o on o.creation_date=c.db_date\
     where c.year=year(current_date)\
-    group by c.year, c.month")
+    group by c.year, c.month_name")
     .then(([results]) => results);
 
 const findForProduct = (product) => {

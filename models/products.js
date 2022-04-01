@@ -65,7 +65,7 @@ const create = ({
                 SKU,
                 Characteristic,
                 Description,
-                Ingredients_details
+                Ingredients_details  
             };
         });
 };

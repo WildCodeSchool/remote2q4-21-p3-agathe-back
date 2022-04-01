@@ -15,6 +15,7 @@ ALTER TABLE OrderLine DROP FOREIGN KEY fk_OrderLine_OrderID;
 ALTER TABLE OrderLine DROP FOREIGN KEY fk_OrderLine_ProductID;
 ALTER TABLE Ingredients DROP FOREIGN KEY fk_Ingredients_ProductID;
 
+DROP VIEW IF EXISTS orders_detail;
 DROP VIEW IF EXISTS orders_header;
 DROP TABLE IF EXISTS orders;
 DROP TABLE IF EXISTS OrderLine;
@@ -144,6 +145,27 @@ FROM orders AS o
     LEFT JOIN orderstatus AS se ON se.orderid=o.orderid and se.stateid=3
     JOIN orderstates os ON os.id=o.status_id
     JOIN users AS u on u.id=o.userid
+;
+
+CREATE VIEW orders_detail as
+SELECT o.OrderId as order_id, 
+    u.id as user_id, concat(u.firstname," ", u.lastname) as user_name, 
+    p.productid as product_id,
+    concat(p.sku, "-", p.name) as product,
+    l.quantity,
+    l.price * l.quantity as amount,
+    s.statusdate as order_date,
+    sp.statusdate as payment_date,
+    se.statusdate as expedition_date,
+     os.id as status_id, os.state
+FROM orders o
+    JOIN orderline l on l.orderid=o.orderid
+    JOIN products p on p.productid=l.productid
+    JOIN users u on u.id=o.userid
+    JOIN orderstates os ON os.id=o.status_id
+    JOIN orderstatus s on s.orderid=o.orderid and s.stateid=1
+    LEFT JOIN orderstatus sp on sp.orderid=o.orderid and sp.stateid=2
+    LEFT JOIN orderstatus se on se.orderid=o.orderid and se.stateid=3
 ;
 
 -- PRESENTATION

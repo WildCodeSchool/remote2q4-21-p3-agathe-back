@@ -1,6 +1,8 @@
 const productsRouter = require("express").Router();
+const Orders = require('../models/orders')
 const Products = require("../models/products");
 const Ingredients = require("../models/ingredients");
+const { checkJwt, isAdmin } = require('../middlewares/checkJwt')
 
 productsRouter.get('/', (req, res) => {
     Products.findMany()
@@ -39,6 +41,12 @@ productsRouter.get('/:id', (req, res) => {
             console.log(err)
             res.status(500).send('Error retrieving product from database');
         });
+});
+
+productsRouter.get('/:id/orders', checkJwt, isAdmin, (req, res) => {
+    return Orders.findForProduct(req.params.id)
+        .then(rows => res.json(rows))
+        .catch(err => res.status(500).send('Error retrieving orders for user from database'))
 });
 
 productsRouter.get('/count', (req, res) =>
@@ -81,10 +89,10 @@ productsRouter.post('/', (req, res) => {
                 let ingredients = get_ingredients(req.body);
                 for (let ingredient of ingredients) {
                     Ingredients.create(createdProduct.ProductID,
-                    ingredient.name,
-                    ingredient.description)
+                        ingredient.name,
+                        ingredient.description)
                 }
-                
+
                 res.status(201).json(createdProduct);
             })
             .catch((err) => {

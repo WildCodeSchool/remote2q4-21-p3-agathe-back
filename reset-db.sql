@@ -8,11 +8,12 @@
 
 SET NAMES utf8;
 
-ALTER TABLE Orders DROP FOREIGN KEY fk_Order_UserID;
-ALTER TABLE Orders DROP FOREIGN KEY fk_Order_OrderStatusID; // to delete
-ALTER TABLE Orders DROP FOREIGN KEY fk_Order_status_id;
-ALTER TABLE OrderLine DROP FOREIGN KEY fk_OrderLine_OrderID;
-ALTER TABLE OrderLine DROP FOREIGN KEY fk_OrderLine_ProductID;
+ALTER TABLE orders DROP FOREIGN KEY fk_Order_UserID; -- to delete
+ALTER TABLE orders DROP FOREIGN KEY fk_orders_UserID;
+ALTER TABLE orders DROP FOREIGN KEY fk_order_OrderStatusID; -- to delete
+ALTER TABLE orders DROP FOREIGN KEY fk_orders_status_id;
+ALTER TABLE OrderLine DROP FOREIGN KEY fk_orderLine_OrderID;
+ALTER TABLE OrderLine DROP FOREIGN KEY fk_orderLine_ProductID;
 ALTER TABLE Ingredients DROP FOREIGN KEY fk_Ingredients_ProductID;
 
 DROP VIEW IF EXISTS orders_detail;
@@ -20,7 +21,9 @@ DROP VIEW IF EXISTS orders_header;
 DROP TABLE IF EXISTS orders;
 DROP TABLE IF EXISTS OrderLine;
 DROP TABLE IF EXISTS OrderStates;
+DROP TABLE IF EXISTS states;
 DROP TABLE IF EXISTS OrderStatus;
+DROP TABLE IF EXISTS orders_status;
 DROP TABLE IF EXISTS presentation;
 DROP TABLE IF EXISTS products;
 DROP TABLE IF EXISTS ingredients;
@@ -43,14 +46,15 @@ CREATE TABLE OrderLine (
     Price decimal(8,2) NOT NULL
 );
 
-CREATE TABLE OrderStatus (
-    OrderStatusID int NOT NULL PRIMARY KEY AUTO_INCREMENT,
-    OrderID int not null,
-    StateID int not null,
-    StatusDate date NOT NULL
+CREATE TABLE orders_status (
+    id int NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    order_id int not null,
+    state_id int not null,
+    status_date date NOT NULL
 );
 
-CREATE TABLE OrderStates (
+-- States of orders
+CREATE TABLE states (
     id int NOT NULL PRIMARY KEY,
     state varchar(20) NOT NULL 
 );
@@ -110,11 +114,11 @@ CREATE TABLE calendar (
     UNIQUE td_dbdate_idx (db_date)
 );
 
-ALTER TABLE orders ADD CONSTRAINT fk_Order_UserID FOREIGN KEY(UserID)
+ALTER TABLE orders ADD CONSTRAINT fk_orders_UserID FOREIGN KEY(UserID)
 REFERENCES users(ID);
 
-ALTER TABLE orders ADD CONSTRAINT fk_Order_status_id FOREIGN KEY(status_id)
-REFERENCES OrderStates(id);
+ALTER TABLE orders ADD CONSTRAINT fk_orders_status_id FOREIGN KEY(status_id)
+REFERENCES states(id);
 
 ALTER TABLE OrderLine ADD CONSTRAINT fk_OrderLine_OrderID FOREIGN KEY(OrderID)
 REFERENCES orders(OrderID);
@@ -134,16 +138,16 @@ ON users(LastName);
 CREATE VIEW orders_header as
 SELECT o.orderid, o.totalamount as total_amount,
     u.id as user_id, u.firstname as first_name, u.lastname as last_name, u.email,
-    sc.statusdate as creation_date,
-    sp.statusdate as payment_date,
-    se.statusdate as expedition_date,
-    s.statusdate as date, os.id as status_id, os.state
+    sc.status_date as creation_date,
+    sp.status_date as payment_date,
+    se.status_date as expedition_date,
+    s.status_date as date, os.id as status_id, os.state
 FROM orders AS o
-    JOIN orderstatus AS s ON s.orderid=o.orderid and o.status_id=s.stateid
-    JOIN orderstatus AS sc ON sc.orderid=o.orderid and sc.stateid=1
-    LEFT JOIN orderstatus AS sp ON sp.orderid=o.orderid and sp.stateid=2
-    LEFT JOIN orderstatus AS se ON se.orderid=o.orderid and se.stateid=3
-    JOIN orderstates os ON os.id=o.status_id
+    JOIN orders_status AS s ON s.order_id=o.orderid and o.status_id=s.state_id
+    JOIN orders_status AS sc ON sc.order_id=o.orderid and sc.state_id=1
+    LEFT JOIN orders_status AS sp ON sp.order_id=o.orderid and sp.state_id=2
+    LEFT JOIN orders_status AS se ON se.order_id=o.orderid and se.state_id=3
+    JOIN states os ON os.id=o.status_id
     JOIN users AS u on u.id=o.userid
 ;
 
@@ -154,18 +158,18 @@ SELECT o.OrderId as order_id,
     concat(p.sku, "-", p.name) as product,
     l.quantity,
     l.price * l.quantity as amount,
-    s.statusdate as order_date,
-    sp.statusdate as payment_date,
-    se.statusdate as expedition_date,
+    s.status_date as order_date,
+    sp.status_date as payment_date,
+    se.status_date as expedition_date,
      os.id as status_id, os.state
 FROM orders o
     JOIN orderline l on l.orderid=o.orderid
     JOIN products p on p.productid=l.productid
     JOIN users u on u.id=o.userid
-    JOIN orderstates os ON os.id=o.status_id
-    JOIN orderstatus s on s.orderid=o.orderid and s.stateid=1
-    LEFT JOIN orderstatus sp on sp.orderid=o.orderid and sp.stateid=2
-    LEFT JOIN orderstatus se on se.orderid=o.orderid and se.stateid=3
+    JOIN states os ON os.id=o.status_id
+    JOIN orders_status s on s.order_id=o.orderid and s.state_id=1
+    LEFT JOIN orders_status sp on sp.order_id=o.orderid and sp.state_id=2
+    LEFT JOIN orders_status se on se.order_id=o.orderid and se.state_id=3
 ;
 
 -- PRESENTATION
@@ -184,7 +188,8 @@ VALUES ( 1, 'admin', '', '0123456789', '$argon2i$v=19$m=4096,t=3,p=1$wkqEhPhX1FZ
  ( 2, 'test', '', '0123456789', '$argon2i$v=19$m=4096,t=3,p=1$wkqEhPhX1FZ9ZHdLinesLw$G5UATWBEKq++UpMHK2CnvNYnnbCANu06mVzGv7dX/94', 'test@example.com', false, '', 0 ,''),
  ( 3, 'Jean', 'Dupont', '0123456789', '$argon2i$v=19$m=4096,t=3,p=1$wkqEhPhX1FZ9ZHdLinesLw$G5UATWBEKq++UpMHK2CnvNYnnbCANu06mVzGv7dX/94', 'jean.dupont@example.com', false, '', 0 ,''),
  ( 4, 'Pierre', 'Martin', '0123456789', '$argon2i$v=19$m=4096,t=3,p=1$wkqEhPhX1FZ9ZHdLinesLw$G5UATWBEKq++UpMHK2CnvNYnnbCANu06mVzGv7dX/94', 'pierre.martin@example.com', false, '', 0 ,''),
- ( 5, 'Franck', 'Thomas', '0123456789', '$argon2i$v=19$m=4096,t=3,p=1$wkqEhPhX1FZ9ZHdLinesLw$G5UATWBEKq++UpMHK2CnvNYnnbCANu06mVzGv7dX/94', 'franck.thomas@example.com', false, '', 0 ,'')
+ ( 5, 'Franck', 'Thomas', '0123456789', '$argon2i$v=19$m=4096,t=3,p=1$wkqEhPhX1FZ9ZHdLinesLw$G5UATWBEKq++UpMHK2CnvNYnnbCANu06mVzGv7dX/94', 'franck.thomas@example.com', false, '', 0 ,''),
+ ( 6, 'Peter', 'Parker', '0123456789', '$argon2i$v=19$m=4096,t=3,p=1$wkqEhPhX1FZ9ZHdLinesLw$G5UATWBEKq++UpMHK2CnvNYnnbCANu06mVzGv7dX/94', 'peter.parker@buggle.com', false, '', 0 ,'')
  ;
 
 -- Insert ingrédients
@@ -207,13 +212,13 @@ INSERT INTO ingredients(ProductID, name, description) VALUES
 -- -------------------------------------------
 -- Orders
 -- -------------------------------------------
-INSERT INTO OrderStates(id, state) VALUES
+INSERT INTO states(id, state) VALUES
 (1, 'En attente'),
 (2, 'Payé'),
 (3, 'Envoyé')
 ;
 
-INSERT INTO OrderStatus(OrderID, StateID, StatusDate) VALUES
+INSERT INTO orders_status(order_id, state_id, status_date) VALUES
 (1, 1, '20220220'),
 (1, 2, '20220220'),
 (1, 3, '20220220'),
@@ -223,7 +228,11 @@ INSERT INTO OrderStatus(OrderID, StateID, StatusDate) VALUES
 (4, 1, '20220318'),
 (4, 2, '20220324'),
 (5, 1, '20220324'),
-(5, 2, '20220330')
+(5, 2, '20220330'),
+(6, 1, '20220331'),
+(6, 2, '20220331'),
+(7, 1, '20220401'),
+(7, 2, '20220401')
 ;
 
 INSERT INTO orders(OrderID, UserID, TotalAmount, status_id) VALUES
@@ -231,7 +240,9 @@ INSERT INTO orders(OrderID, UserID, TotalAmount, status_id) VALUES
 (2, 4,  68, 2),
 (3, 5, 100, 1),
 (4, 3,  20, 2),
-(5, 5,  41, 2)
+(5, 5,  41, 2),
+(6, 6,  17, 2),
+(7, 6,  21, 2)
 ;
 
 INSERT INTO OrderLine (OrderID, ProductID, Quantity, Price) VALUES
@@ -241,7 +252,9 @@ INSERT INTO OrderLine (OrderID, ProductID, Quantity, Price) VALUES
 (3, 4, 5,  20),
 (4, 4, 1,  20),
 (5, 2, 1,  21),
-(5, 4, 1,  20)
+(5, 4, 1,  20),
+(6, 1, 1,  17),
+(7, 2, 1,  21)
 ;
 
 DELIMITER //

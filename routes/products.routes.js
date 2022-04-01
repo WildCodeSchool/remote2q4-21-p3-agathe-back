@@ -107,7 +107,6 @@ productsRouter.post('/', (req, res) => {
 
 productsRouter.post('/', upload.single('picture'), async (req, res) => {
     // const [{ insertId: id}] = await insertPost(req.body, req.file.path);
-
     return res.json({
         ...req.body,
         id,

@@ -136,7 +136,7 @@ CREATE INDEX idx_User_LastName
 ON users(LastName);
 
 CREATE VIEW orders_header as
-SELECT o.orderid, o.totalamount as total_amount,
+SELECT o.orderid as id, o.totalamount as total_amount,
     u.id as user_id, u.firstname as first_name, u.lastname as last_name, u.email,
     sc.status_date as creation_date,
     sp.status_date as payment_date,
@@ -152,7 +152,7 @@ FROM orders AS o
 ;
 
 CREATE VIEW orders_detail as
-SELECT o.OrderId as order_id, 
+SELECT o.OrderId as id, 
     u.id as user_id, concat(u.firstname," ", u.lastname) as user_name, 
     p.productid as product_id,
     concat(p.sku, "-", p.name) as product,

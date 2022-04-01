@@ -14,15 +14,6 @@ router.get('/', checkJwt, isAdmin, (req, res) =>
     })
 );
 
-router.get('/total', (req, res) =>
-    Orders.total()
-    .then(orders => res.json(orders))
-    .catch(err => {
-        console.log(err)
-        res.status(500).send('Erreur en recherchant le montant des ventes dans la base de données')
-    })
-)
-
 router.get('/count', (req, res) =>
     Orders.count()
     .then(orders => res.json(orders))
@@ -32,6 +23,25 @@ router.get('/count', (req, res) =>
     })
 )
 
+router.get('/total', (req, res) =>
+    Orders.total()
+    .then(orders => res.json(orders))
+    .catch(err => {
+        console.log(err)
+        res.status(500).send('Erreur en recherchant le montant des ventes dans la base de données')
+    })
+)
+
+router.get('/pending_deliveries', (req, res) =>
+    Orders.pendingDeliveries()
+    .then(orders => res.json(orders))
+    .catch(err => {
+        console.log(err)
+        res.status(500).send('Erreur en recherchant les commandes en attente de livraison')
+    })
+)
+
+// Stats
 router.get('/daily_sales', (req, res) =>
     Orders.dailySales()
     .then(sales => res.json(sales))

@@ -54,7 +54,7 @@ const lastMonthSales = () => {
         .then(([results]) => results[0]);
 }
 
-const yearlySales = () => 
+const yearlySales = () =>
     db.query("SELECT c.year, c.month_name, coalesce(sum(o.total_amount),0) AS total_amount\
     from calendar c\
     left join orders_header o on o.creation_date=c.db_date\
@@ -64,7 +64,7 @@ const yearlySales = () =>
 
 const findForProduct = (product) => {
     let select = '\
-    select order_id, product_id, product, user_id, user_name,\
+    select id, product_id, product, user_id, user_name,\
         quantity, amount, order_date, state\
     from orders_detail\
     where product_id=?'
@@ -75,7 +75,7 @@ const findForProduct = (product) => {
 
 const findForUser = (user) => {
     let select = '\
-    select order_id, product_id, product, user_id, user_name,\
+    select id, product_id, product, user_id, user_name,\
         quantity, amount, order_date, state\
     from orders_detail\
     where user_id=?'
@@ -86,7 +86,7 @@ const findForUser = (user) => {
 
 const findMany = () => {
     let select = '\
-    select order_id, product_id, product, user_id, user_name,\
+    select id, product_id, product, user_id, user_name,\
         quantity, amount, order_date, state\
     from orders_detail'
     return db
@@ -99,6 +99,18 @@ const findMany = () => {
 //         .query('SELECT * FROM ingredients WHERE ingredientID = ?', [id])
 //         .then(([results]) => results[0]);
 // };
+
+const pendingDeliveries = () => {
+    let select = '\
+    select id, product_id, product, user_id, user_name,\
+        quantity, amount, order_date, state\
+    from orders_detail\
+    where status_id=2\
+    order by id'
+    return db
+        .query(select)
+        .then(([results]) => results);
+}
 
 const create = ({ UserID, TotalAmount, status_id }) => {
     // console.log(`Orders.create(${UserID}, ${TotalAmount}, ${status_id})`)
@@ -122,15 +134,16 @@ const update = (id, newAttributes) => {
 // };
 
 module.exports = {
+    count,
     create,
+    dailySales,
     findForProduct,
     findForUser,
     findMany,
-    total,
-    count,
     lastMonthSales,
     lastWeekSales,
-    dailySales,
+    pendingDeliveries,
+    total,
     yesterdaySales,
     yearlySales
     // findOne,

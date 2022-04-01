@@ -71,30 +71,35 @@ const lastMonthSales = () => {
         .then(([results]) => results[0]);
 }
 
-const findForUser = (user) => {
+const findForProduct = (product) => {
+    let select = '\
+    select order_id, product_id, product, user_id, user_name,\
+        quantity, amount, order_date, state\
+    from orders_detail\
+    where product_id=?'
     return db
-        .query('SELECT o.OrderId, concat(p.sku, "-", p.name) as product,\
-         concat(u.firstname," ", u.lastname) as name, l.quantity, l.price * l.quantity as amount,\
-         s.statusdate as OrderDate\
-        FROM orders o\
-        JOIN orderline l on l.orderid=o.orderid\
-        JOIN products p on p.productid=l.productid\
-        JOIN users u on u.id=o.userid \
-        JOIN orderstatus s on s.orderid=o.orderid and s.stateid=1\
-        WHERE o.userid=?', [user])
+        .query(select, [product])
+        .then(([results]) => results);
+}
+
+const findForUser = (user) => {
+    let select = '\
+    select order_id, product_id, product, user_id, user_name,\
+        quantity, amount, order_date, state\
+    from orders_detail\
+    where user_id=?'
+    return db
+        .query(select, [user])
         .then(([results]) => results);
 }
 
 const findMany = () => {
+    let select = '\
+    select order_id, product_id, product, user_id, user_name,\
+        quantity, amount, order_date, state\
+    from orders_detail'
     return db
-        .query('SELECT o.OrderId, concat(p.sku, "-", p.name) as product,\
-         concat(u.firstname," ", u.lastname) as name, l.quantity, l.price * l.quantity as amount,\
-         s.statusdate as OrderDate\
-        FROM orders o\
-        JOIN orderline l on l.orderid=o.orderid\
-        JOIN products p on p.productid=l.productid\
-        JOIN users u on u.id=o.userid \
-        JOIN orderstatus s on s.orderid=o.orderid and s.stateid=1')
+        .query(select)
         .then(([results]) => results);
 }
 
@@ -127,6 +132,7 @@ const update = (id, newAttributes) => {
 
 module.exports = {
     create,
+    findForProduct,
     findForUser,
     findMany,
     total,

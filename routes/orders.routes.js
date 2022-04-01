@@ -68,6 +68,15 @@ router.get('/yesterday_sales', (req, res) =>
     })
 );
 
+router.get('/yearly_sales', (req, res) =>
+    Orders.yearlySales()
+    .then(orders => res.json(orders))
+    .catch(err => {
+        console.log(err)
+        res.status(500).send("Erreur en recherchant le montant des commandes sur l'année")
+    })
+);
+
 // router.get('/:id', (req, res) =>
 //     Users.findOne(req.params.id)
 //     .then(user => {

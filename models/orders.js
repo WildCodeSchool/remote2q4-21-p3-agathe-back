@@ -13,7 +13,7 @@ const count = () =>
 
 const dailySales = () => {
     let select = '\
-    SELECT SUM(o.TotalAmount) AS sales\
+    SELECT coalesce(SUM(o.TotalAmount),0) AS sales\
     FROM Orders AS o\
         JOIN orderstatus AS s ON s.orderid=o.orderid and s.stateid=2\
     WHERE s.StatusDate = CURRENT_DATE()'
@@ -28,7 +28,7 @@ const yesterdaySales = () => {
     // JOIN orderstatus AS s ON s.orderid=o.orderid and s.stateid=2\
     // WHERE s.statusdate = subdate(current_date, 1)')
     let select = '\
-    SELECT SUM(o.total_amount) AS sales\
+    SELECT coalesce(SUM(o.total_amount),0) AS sales\
     FROM orders_header AS o\
     WHERE o.payment_date = subdate(current_date, 1)'
     return db
@@ -36,14 +36,14 @@ const yesterdaySales = () => {
         .then(([results]) => results[0]);
 }
 const lastWeekSales = () => {
-    // db.query('SELECT SUM(o.totalamount) AS lastWeekSales\
+    // db.query('SELECT SUM(o.totalamount) AS lastWeekSales\c
     // FROM orders AS o\
     // JOIN orderstatus AS s ON s.orderid=o.orderid and s.stateid=2\
     // JOIN calendar AS oc ON oc.db_date=s.statusdate\
     // JOIN calendar AS c ON c.db_date=date_sub(curdate(), interval 1 WEEK)\
     // WHERE oc.year=c.year AND oc.week=c.week')
     let select = '\
-    SELECT SUM(o.total_amount) AS sales\
+    SELECT coalesce(SUM(o.total_amount),0) AS sales\
     FROM orders_header AS o \
         JOIN calendar oc on oc.db_date=o.payment_date\
         JOIN calendar AS c ON c.db_date=date_sub(curdate(), interval 1 WEEK) \
@@ -61,7 +61,7 @@ const lastMonthSales = () => {
     // JOIN calendar AS c ON c.db_date=date_sub(curdate(), interval 1 month)\
     // WHERE oc.year=c.year AND oc.month=c.month')
     let select = '\
-    SELECT SUM(o.total_amount) AS sales\
+    SELECT coalesce(SUM(o.total_amount),0) AS sales\
     FROM orders_header AS o\
         JOIN calendar oc on oc.db_date=o.payment_date\
         JOIN calendar AS c ON c.db_date = date_sub(curdate(), interval 1 month)\
@@ -70,6 +70,14 @@ const lastMonthSales = () => {
         .query(select)
         .then(([results]) => results[0]);
 }
+
+const yearlySales = () => 
+    db.query("SELECT c.year, c.month, coalesce(sum(o.total_amount),0) AS total_amount\
+    from calendar c\
+    left join orders_header o on o.creation_date=c.db_date\
+    where c.year=year(current_date)\
+    group by c.year, c.month")
+    .then(([results]) => results);
 
 const findForProduct = (product) => {
     let select = '\
@@ -140,7 +148,8 @@ module.exports = {
     lastMonthSales,
     lastWeekSales,
     dailySales,
-    yesterdaySales
+    yesterdaySales,
+    yearlySales
     // findOne,
     // update,
     // destroy

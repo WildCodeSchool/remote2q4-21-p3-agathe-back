@@ -5,7 +5,7 @@ const Products = require("../models/products");
 const Ingredients = require("../models/ingredients");
 const { checkJwt, isAdmin } = require('../middlewares/checkJwt')
 
-const upload = multer({ dest: '../assets'});
+const upload = multer({ dest: 'assets' });
 
 productsRouter.get('/', (req, res) => {
     Products.findMany()
@@ -75,7 +75,8 @@ const get_ingredients = (req) => {
     return ingredients.filter(item => item.name && item.description) // not empty
 }
 
-productsRouter.post('/', (req, res) => {
+productsRouter.post('/', upload.single('picture'), (req, res) => {
+    console.log(req.file)
     const {
         value,
         error
@@ -105,14 +106,14 @@ productsRouter.post('/', (req, res) => {
     }
 });
 
-productsRouter.post('/', upload.single('picture'), async (req, res) => {
-    // const [{ insertId: id}] = await insertPost(req.body, req.file.path);
-    return res.json({
-        ...req.body,
-        id,
-        picture: req.file.filename
-    });
-});
+// productsRouter.post('/', upload.single('picture'), async (req, res) => {
+//     // const [{ insertId: id}] = await insertPost(req.body, req.file.path);
+//     return res.json({
+//         ...req.body,
+//         id,
+//         picture: req.file.filename
+//     });
+// });
 
 productsRouter.put('/:id', (req, res) => {
     let existingProducts = null;

@@ -64,7 +64,7 @@ const userSchema = Joi.object({
 })
 
 
-router.post('/', async (req, res) => {
+router.post('/', async(req, res) => {
     // recup donnees requete
     const {
         value,
@@ -99,7 +99,7 @@ router.post('/', async (req, res) => {
     })
 })
 
-router.put('/:id', async (req, res) => {
+router.put('/:id', async(req, res) => {
     const userId = req.params.id;
     try {
         let existingUser = await Users.findOne(userId);

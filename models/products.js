@@ -13,7 +13,8 @@ const validate = ({
     sku,
     characteristic,
     description,
-    ingredients_details
+    ingredients_details,
+    picture
 }) => {
     return Joi.object({
         name: Joi.string().max(250).required(),
@@ -22,6 +23,7 @@ const validate = ({
         characteristic: Joi.string().required(),
         description: Joi.string().required(),
         ingredients_details: Joi.string().required(),
+        picture: Joi.string(),
     }).validate({
         name,
         price,
@@ -29,6 +31,7 @@ const validate = ({
         characteristic,
         description,
         ingredients_details,
+        picture,
     }, {
         abortEarly: false
     })
@@ -52,10 +55,11 @@ const create = ({
     sku,
     characteristic,
     description,
-    ingredients_details
+    ingredients_details,
+    picture
 }) => {
     return db
-        .query("INSERT INTO products (name, price, sku, characteristic, description, ingredients_details) VALUES (?, ?, ?, ?, ?, ?)", [name, price, sku, characteristic, description, ingredients_details])
+        .query("INSERT INTO products (name, price, sku, characteristic, description, ingredients_details, picture) VALUES (?, ?, ?, ?, ?, ?, ?)", [name, price, sku, characteristic, description, ingredients_details, picture])
         .then(([results]) => {
             const id = results.insertId;
             return {
@@ -65,7 +69,8 @@ const create = ({
                 sku,
                 characteristic,
                 description,
-                ingredients_details
+                ingredients_details,
+                picture,
             };
         });
 };

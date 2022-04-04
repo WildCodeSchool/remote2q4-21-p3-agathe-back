@@ -76,7 +76,6 @@ const get_ingredients = (req) => {
 }
 
 productsRouter.post('/', upload.single('picture'), (req, res) => {
-    console.log(req.file)
     const {
         value,
         error
@@ -88,6 +87,7 @@ productsRouter.post('/', upload.single('picture'), (req, res) => {
         });
     } else {
         // begin transaction
+        value['picture'] = req.file.filename
         Products.create(value)
             .then((createdProduct) => {
                 let ingredients = get_ingredients(req.body);

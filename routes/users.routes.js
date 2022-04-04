@@ -72,9 +72,9 @@ router.post('/', async(req, res) => {
         error
     } = userSchema.validate(req.body);
     if (error) {
-        console.log(error)
         return res.status(400).json(error);
     }
+    console.log('validated !')
 
     // verifie si user existe
     // await permet d'etre sur d'avoir un retour de verif user
@@ -90,9 +90,9 @@ router.post('/', async(req, res) => {
     // etape de l'encryptage
     const hashedPassword = await argon2.hash(value.password);
 
-    await Users.insertUser(value.email, hashedPassword, value.FirstName, value.LastName,
-        value.PhoneNumber, value.Address1, value.Address2, value.Address3,
-        value.postCode, value.city);
+    await Users.insertUser(value.email, hashedPassword, value.first_name, value.last_name,
+        value.phone_number, value.address_1, value.address_2, value.address_3,
+        value.post_code, value.city);
 
     const jwtKey = generateJWT(value.email, 'ROLE_USER');
     return res.json({

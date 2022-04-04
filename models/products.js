@@ -8,27 +8,27 @@ const count = () =>
     .then(([results]) => results[0]);
 
 const validate = ({
-    Name,
-    Price,
-    SKU,
-    Characteristic,
-    Description,
-    Ingredients_details
+    name,
+    price,
+    sku,
+    characteristic,
+    description,
+    ingredients_details
 }) => {
     return Joi.object({
-        Name: Joi.string().max(250).required(),
-        Price: Joi.number().max(999).required(),
-        SKU: Joi.string().max(13).uppercase().required(),
-        Characteristic: Joi.string().required(),
-        Description: Joi.string().required(),
-        Ingredients_details: Joi.string().required(),
+        name: Joi.string().max(250).required(),
+        price: Joi.number().max(999).required(),
+        sku: Joi.string().max(13).uppercase().required(),
+        characteristic: Joi.string().required(),
+        description: Joi.string().required(),
+        ingredients_details: Joi.string().required(),
     }).validate({
-        Name,
-        Price,
-        SKU,
-        Characteristic,
-        Description,
-        Ingredients_details
+        name,
+        price,
+        sku,
+        characteristic,
+        description,
+        ingredients_details,
     }, {
         abortEarly: false
     })
@@ -47,12 +47,12 @@ const findOne = (id) => {
 };
 
 const create = ({
-    Name,
-    Price,
-    SKU,
-    Characteristic,
-    Description,
-    Ingredients_details
+    name,
+    price,
+    sku,
+    characteristic,
+    description,
+    ingredients_details
 }) => {
     return db
         .query("INSERT INTO products (name, price, sku, characteristic, description, ingredients_details) VALUES (?, ?, ?, ?, ?, ?)", [name, price, sku, characteristic, description, ingredients_details])

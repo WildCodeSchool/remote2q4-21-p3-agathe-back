@@ -65,7 +65,7 @@ const yearlySales = () =>
 const findForProduct = (product) => {
     let select = '\
     select id, product_id, product, user_id, user_name,\
-        quantity, amount, order_date, state\
+        quantity, amount, order_date, state, picture\
     from orders_detail\
     where product_id=?'
     return db

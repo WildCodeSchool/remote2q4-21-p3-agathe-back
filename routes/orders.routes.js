@@ -3,7 +3,7 @@ const Joi = require('joi');
 const { checkJwt, isAdmin } = require('../middlewares/checkJwt')
 const Orders = require('../models/orders');
 const OrdersStatus = require('../models/ordersStatus');
-const OrdersLine = require('../models/ordersLine')
+const OrdersLines = require('../models/ordersLines')
 
 router.get('/', checkJwt, isAdmin, (req, res) =>
     Orders.findMany()
@@ -118,25 +118,25 @@ router.post('/', checkJwt, (req, res) => {
     //     console.log(error)
     //     return res.status(400).json(error);
     // }
-    const UserID = req.user.id
-    const TotalAmount = req.body.reduce(
+    const user_id = req.user.id
+    const total_amount = req.body.reduce(
         (total, cartItem) => total + cartItem.quantity * cartItem.price,
         0
     );
 
     // vérifier total amount
 
-    Orders.create({ UserID, TotalAmount, status_id: 1 })
+    Orders.create({ user_id, total_amount, status_id: 1 })
         .then(order => {
             // add status
-            let OrderID = order.OrderID
-            let StateID = 1
-            let StatusDate = new Date()
-            OrdersStatus.create({ OrderID, StateID, StatusDate })
+            let order_id = order.id
+            let state_id = 1
+            let status_date = new Date()
+            OrdersStatus.create({ order_id, state_id, status_date })
 
             // add lines
             for (let line of req.body)
-                OrdersLine.create({ OrderID, ProductID: line.ProductID, Quantity: line.quantity, Price: line.price })
+                OrdersLines.create({ order_id, id: line.id, quantity: line.quantity, price: line.price })
 
             res.json(order)
         })

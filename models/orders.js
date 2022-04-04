@@ -4,11 +4,11 @@ const connection = require("../db-config");
 const db = connection.promise();
 
 const total = () =>
-    db.query('SELECT SUM(TotalAmount) AS total FROM orders')
+    db.query('SELECT SUM(total_amount) AS total FROM orders')
     .then(([results]) => results[0]);
 
 const count = () =>
-    db.query('SELECT COUNT(OrderID) AS count from orders')
+    db.query('SELECT COUNT(*) AS count from orders')
     .then(([results]) => results[0]);
 
 const dailySales = () => {
@@ -76,7 +76,7 @@ const findForProduct = (product) => {
 const findForUser = (user) => {
     let select = '\
     select id, product_id, product, user_id, user_name,\
-        quantity, amount, order_date, state\
+        quantity, amount, order_date, state, picture\
     from orders_detail\
     where user_id=?'
     return db
@@ -87,7 +87,7 @@ const findForUser = (user) => {
 const findMany = () => {
     let select = '\
     select id, product_id, product, user_id, user_name,\
-        quantity, amount, order_date, state\
+        quantity, amount, order_date, state, picture\
     from orders_detail'
     return db
         .query(select)
@@ -103,7 +103,7 @@ const findMany = () => {
 const pendingDeliveries = () => {
     let select = '\
     select id, product_id, product, user_id, user_name,\
-        quantity, amount, order_date, state\
+        quantity, amount, order_date, state, picture\
     from orders_detail\
     where status_id=2\
     order by id'
@@ -112,14 +112,14 @@ const pendingDeliveries = () => {
         .then(([results]) => results);
 }
 
-const create = ({ UserID, TotalAmount, status_id }) => {
-    // console.log(`Orders.create(${UserID}, ${TotalAmount}, ${status_id})`)
+const create = ({ user_id, total_amount, status_id }) => {
+    // console.log(`Orders.create(${user_id}, ${total_amount}, ${status_id})`)
     return db
-        .query("INSERT INTO orders(UserID, TotalAmount, status_id) VALUES (?, ?, ?)", [UserID, TotalAmount, status_id])
+        .query("INSERT INTO orders(user_id, total_amount, status_id) VALUES (?, ?, ?)", [user_id, total_amount, status_id])
         .then(([results]) => {
             // console.log(results)
-            const OrderID = results.insertId;
-            return { OrderID, UserID, TotalAmount, status_id };
+            const id = results.insertId;
+            return { id, user_id, total_amount, status_id };
         });
 };
 

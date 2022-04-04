@@ -26,6 +26,7 @@ const corsOptions = {
 }
 app.use(cors(corsOptions))
 app.use('/api', router);
+app.use('/assets', express.static('assets'));
 
 app.get("/", (req, res) => {
     res.send("Welcome");

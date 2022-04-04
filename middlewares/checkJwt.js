@@ -42,7 +42,7 @@ const isAdmin = (req, res, next) => {
             return res.status(401).json({
                 message: `User not exists`
             });
-        } else if (!req.user.IsAdmin) {
+        } else if (!req.user.is_admin) {
             return res.status(403).json({
                 message: `User is not admin`
             });

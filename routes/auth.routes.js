@@ -30,7 +30,7 @@ authRouter.post('/login', async(req, res, next) => {
                             if (passwordIsCorrect) {
                                 /* 6. On créer le JWT */
                                 // const token = calculateJWTToken(user);
-                                const token = generateJWT(user.email, user.IsAdmin);
+                                const token = generateJWT(user.email, user.is_admin);
                                 let date = new Date();
                                 // date.setTime(date.getTime() + (60 * 60 * 1000));
                                 let oneHour = 60 * 60; // expires in 1 hour

@@ -2,24 +2,24 @@ const connection = require("../db-config");
 
 const db = connection.promise();
 
-const ingredientsForProduct = (productID) => {
+const ingredientsForProduct = (product_id) => {
     return db
-        .query('SELECT * FROM ingredients WHERE productID = ?', [productID])
+        .query('SELECT * FROM ingredients WHERE product_id = ?', [product_id])
         .then(([results]) => results);
 }
 
 const findOne = (id) => {
     return db
-        .query('SELECT * FROM ingredients WHERE ingredientID = ?', [id])
+        .query('SELECT * FROM ingredients WHERE id = ?', [id])
         .then(([results]) => results[0]);
 };
 
-const create = (ProductID, Name, Description) => {
+const create = (product_id, name, description) => {
     return db
-        .query("INSERT INTO ingredients (ProductID, Name, Description) VALUES (?, ?, ?)", [ProductID, Name, Description])
+        .query("INSERT INTO ingredients(product_id, name, description) VALUES (?, ?, ?)", [product_id, name, description])
         .then(([results]) => {
             const id = results.insertID;
-            return { id, ProductID, Name, Description };
+            return { id, product_id, name, description };
         });
 };
 

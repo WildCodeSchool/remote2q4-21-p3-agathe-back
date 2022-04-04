@@ -10,46 +10,46 @@ const count = () =>
 
 const findMany = () =>
     db
-    .query('SELECT id, email, FirstName, LastName, phonenumber, address1, address2, address3, postcode, city FROM users')
+    .query('SELECT id, email, first_name, last_name, phone_number, address_1, address_2, address_3, post_code, city FROM users')
     .then(([results]) => results);
 
 const findOne = (id) =>
     db
-    .query('SELECT id, email, firstname, lastname, phonenumber, address1, address2, address3, postcode, city FROM users WHERE id=?', [id])
+    .query('SELECT id, email, first_name, last_name, phone_number, address_1, address_2, address_3, post_code, city FROM users WHERE id=?', [id])
     .then(([results]) => results[0]);
 
 const findUserByEmail = (email) =>
     db
     .query('SELECT * FROM users WHERE email=?', [email]);
 
-const insertUser = (email, password, FirstName, LastName, PhoneNumber,
-        Address1, Address2, Address3, postCode, city) =>
+const insertUser = (email, password, first_name, last_name, phone_number,
+        address_1, address_2, address_3, post_code, city) =>
     db
-    .query('INSERT INTO users (email, password, FirstName, LastName, PhoneNumber,\
-         Address1, Address2, Address3, postCode, city) \
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [email, password, FirstName, LastName, PhoneNumber, Address1, Address2, Address3, postCode, city]);
+    .query('INSERT INTO users (email, password, first_name, last_name, phone_number,\
+         address_1, address_2, address_3, post_code, city) \
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [email, password, first_name, last_name, phone_number, address_1, address_2, address_3, post_code, city]);
 
 const updateUser = ({
         id,
         email,
         password,
-        FirstName,
-        LastName,
-        PhoneNumber,
-        Address1,
-        Address2,
-        Address3,
-        postCode,
+        first_name,
+        last_name,
+        phone_number,
+        address_1,
+        address_2,
+        address_3,
+        post_code,
         city
     }) =>
     db
-    .query('UPDATE users set (email=?, password=?, FirstName=?, LastName=?, PhoneNumber=?,\
-             Address1=?, Address2=?, Address3=?, postCode=?, city=?) \
-            WHERE id=?', [email, password, FirstName, LastName, PhoneNumber, Address1, Address2, Address3, postCode, city, id]);
+    .query('UPDATE users set (email=?, password=?, first_name=?, last_name=?, phone_number=?,\
+             address_1=?, address_2=?, address_3=?, post_code=?, city=?) \
+            WHERE id=?', [email, password, first_name, last_name, phone_number, address_1, address_2, address_3, post_code, city, id]);
 
 const authenticate = (email, password) =>
     db
-    .query('SELECT id, firstname, lastname, email, isAdmin FROM users WHERE email=? and password=?', [email, password]);
+    .query('SELECT id, first_name, last_name, email, is_admin FROM users WHERE email=? and password=?', [email, password]);
 
 const hashingOptions = {
     type: argon2.argon2id,

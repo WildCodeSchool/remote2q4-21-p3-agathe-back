@@ -42,7 +42,7 @@ const findMany = () => {
 
 const findOne = (id) => {
     return db
-        .query('SELECT * FROM products WHERE productid = ?', [id])
+        .query('SELECT * FROM products WHERE id = ?', [id])
         .then(([results]) => results[0]);
 };
 
@@ -55,23 +55,23 @@ const create = ({
     Ingredients_details
 }) => {
     return db
-        .query("INSERT INTO products (Name, Price, SKU, Characteristic , Description, Ingredients_details) VALUES (?, ?, ?, ?, ?, ?)", [Name, Price, SKU, Characteristic, Description, Ingredients_details])
+        .query("INSERT INTO products (name, price, sku, characteristic, description, ingredients_details) VALUES (?, ?, ?, ?, ?, ?)", [name, price, sku, characteristic, description, ingredients_details])
         .then(([results]) => {
-            const ProductID = results.insertId;
+            const id = results.insertId;
             return {
-                ProductID,
-                Name,
-                Price,
-                SKU,
-                Characteristic,
-                Description,
-                Ingredients_details  
+                id,
+                name,
+                price,
+                sku,
+                characteristic,
+                description,
+                ingredients_details
             };
         });
 };
 
 const update = (id, newAttributes) => {
-    return db.query('UPDATE products SET ? WHERE ProductID = ?', [newAttributes, id]);
+    return db.query('UPDATE products SET ? WHERE id = ?', [newAttributes, id]);
 };
 
 const destroy = (id) => {

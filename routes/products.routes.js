@@ -31,7 +31,7 @@ productsRouter.get('/:id', (req, res) => {
     Products.findOne(req.params.id)
         .then((product) => {
             if (product) {
-                Ingredients.ingredientsForProduct(product.ProductID)
+                Ingredients.ingredientsForProduct(product.id)
                     .then((ingredients) => {
                         product.ingredients = ingredients
                         res.json(product);
@@ -92,7 +92,7 @@ productsRouter.post('/', upload.single('picture'), (req, res) => {
             .then((createdProduct) => {
                 let ingredients = get_ingredients(req.body);
                 for (let ingredient of ingredients) {
-                    Ingredients.create(createdProduct.ProductID,
+                    Ingredients.create(createdProduct.id,
                         ingredient.name,
                         ingredient.description)
                 }

@@ -27,6 +27,11 @@ router.get('/count', (req, res) =>
     })
 );
 
+router.get('/who_am_i', checkJwt, (req, res) => {
+    let { password, ...userData } = req.user // remove the password
+    return res.json(userData)
+});
+
 router.get('/:id', (req, res) =>
     Users.findOne(req.params.id)
     .then(user => {
@@ -40,29 +45,25 @@ router.get('/:id', (req, res) =>
 
 router.get('/:id/orders', checkJwt, (req, res) => {
     let UserId;
-    if (req.params.id === '0') {
-        UserId = req.user.id
-    } else UserId = req.params.id
+    if (req.params.id === '0') UserId = req.user.id
+    else UserId = req.params.id
     return Orders.findForUser(UserId)
-        .then(rows => {
-            res.json(rows)
-        })
+        .then(rows => res.json(rows))
         .catch(err => res.status(500).send('Error retrieving orders for user from database'))
 });
 
 const userSchema = Joi.object({
     email: Joi.string().email().required(),
     password: Joi.string().required(),
-    FirstName: Joi.string().required(),
-    LastName: Joi.string().required(),
-    PhoneNumber: Joi.string().required(),
-    Address1: Joi.string().required(),
-    Address2: Joi.string().allow(null, ''),
-    Address3: Joi.string().allow(null, ''),
-    postCode: Joi.string().required(),
+    first_name: Joi.string().required(),
+    last_name: Joi.string().required(),
+    phone_number: Joi.string().required(),
+    address_1: Joi.string().required(),
+    address_2: Joi.string().allow(null, ''),
+    address_3: Joi.string().allow(null, ''),
+    post_code: Joi.string().required(),
     city: Joi.string().required()
 })
-
 
 router.post('/', async(req, res) => {
     // recup donnees requete

@@ -31,6 +31,7 @@ const checkJwt = async(req, res, next) => {
 
         return next(); // call next middleware
     } catch (err) {
+        console.log(err)
         return res.status(401).json();
     }
 };
@@ -52,18 +53,6 @@ const isAdmin = (req, res, next) => {
         return res.status(401).json();
     }
 };
-
-// const checkJwt_old = (req, res, next) => {
-//     if (!req.headers.authorization) {
-//         res.status(401).json();
-//     }
-//     try {
-//         jwt.verify(req.headers.authorization, process.env.JWT_SECRET);
-//         return next();
-//     } catch (err) {
-//         return res.status(401).json();
-//     }
-// };
 
 module.exports = {
     checkJwt,

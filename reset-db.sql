@@ -77,6 +77,7 @@ CREATE TABLE products (
     description text NOT NULL,
     ingredients_details text NOT NULL,
     picture varchar(50),
+    active boolean default true,
 
     CONSTRAINT `uc_products_name` UNIQUE (
         `name`

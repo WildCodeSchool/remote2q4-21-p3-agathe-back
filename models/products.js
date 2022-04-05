@@ -39,15 +39,14 @@ const validate = ({
 
 const findMany = () => {
     return db
-        .query('SELECT * FROM products')
+        .query('SELECT * FROM products where active is true')
         .then(([results]) => results);
 }
 
-const findOne = (id) => {
-    return db
-        .query('SELECT * FROM products WHERE id = ?', [id])
-        .then(([results]) => results[0]);
-};
+const findOne = (id) =>
+    db
+    .query('SELECT * FROM products WHERE id = ?', [id])
+    .then(([results]) => results[0]);
 
 const create = ({
     name,
@@ -75,15 +74,13 @@ const create = ({
         });
 };
 
-const update = (id, newAttributes) => {
-    return db.query('UPDATE products SET ? WHERE id = ?', [newAttributes, id]);
-};
+const update = (id, newAttributes) =>
+    db.query('UPDATE products SET ? WHERE id = ?', [newAttributes, id]);
 
-const destroy = (id) => {
-    return db
-        .query('DELETE FROM products WHERE id = ?', [id])
-        .then(([result]) => result.affectedRows !== 0);
-};
+const destroy = (id) =>
+    db
+    .query('DELETE FROM products WHERE id = ?', [id])
+    .then(([result]) => result.affectedRows !== 0);
 
 module.exports = {
     count,

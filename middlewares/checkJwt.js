@@ -14,9 +14,9 @@ const checkJwt = async(req, res, next) => {
 
         // Check and decode the token
         const decodedToken = jwt.verify(cookies.user_token, process.env.JWT_SECRET);
-
         // Check if user exists
         const { email } = decodedToken;
+
         const [
             [user]
         ] = await User.findUserByEmail(email);
@@ -25,7 +25,6 @@ const checkJwt = async(req, res, next) => {
                 message: `User ${email} not exists`
             });
         }
-
         // Pass the user in the request to access it in other middleware
         req.user = user;
 

@@ -9,10 +9,8 @@ const upload = multer({ dest: 'assets' });
 
 productsRouter.get('/', (req, res) => {
     Products.findMany()
-        .then((products) => {
-            res.json(products);
-        })
-        .catch((err) => {
+        .then(products => res.json(products))
+        .catch(err => {
             console.log(err);
             res.status(500).send('Error retrieving products from database');
         });
@@ -22,14 +20,13 @@ productsRouter.get('/count', (req, res) =>
     Products.count()
     .then(result => res.json(result))
     .catch(err => {
-        console.log(`count ${err}`)
         res.status(500).send('Error retrieving products from database');
     })
 );
 
 productsRouter.get('/:id', (req, res) => {
     Products.findOne(req.params.id)
-        .then((product) => {
+        .then(product => {
             if (product) {
                 Ingredients.ingredientsForProduct(product.id)
                     .then((ingredients) => {
@@ -40,7 +37,7 @@ productsRouter.get('/:id', (req, res) => {
                 res.status(404).send('Product not found');
             }
         })
-        .catch((err) => {
+        .catch(err => {
             console.log(err)
             res.status(500).send('Error retrieving product from database');
         });

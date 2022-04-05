@@ -4,7 +4,7 @@ const argon2 = require('argon2');
 const {
     generateJWT
 } = require('../utils/auth');
-const { checkJwt } = require('../middlewares/checkJwt');
+const { checkJwt, isAdmin } = require('../middlewares/checkJwt');
 const Orders = require('../models/orders');
 const Users = require('../models/users');
 
@@ -93,12 +93,39 @@ router.post('/', async(req, res) => {
     let oneHour = 60 * 60; // expires in 1 hour
     res.cookie("user_token", token, { maxAge: oneHour * 1000, httpOnly: true }); //, secure: true }); HTTPS ONLY
     let { password, ...userData } = value // remove the password
-
     return res.json(userData)
 })
 
-router.put('/:id', async(req, res) => {
+
+router.put('/', checkJwt, async(req, res) => {
+    const userId = req.user.id;
+    try {
+        let existingUser = await Users.findOne(userId);
+        if (!existingUser) throw new Error('RECORD_NOT_FOUND');
+        // etape de l'encryptage
+        // const hashedPassword = await argon2.hash(req.body.password);
+        await Users.updateUser({
+            ...req.body,
+            id: userId,
+            // password: hashedPassword
+        });
+        res.status(200).json({
+            ...existingUser,
+            ...req.body
+        });
+    } catch (err) {
+        console.error(err);
+        if (err === 'RECORD_NOT_FOUND')
+            res.status(404).send(`User with id ${userId} not found.`);
+        else res.status(500).send('Error updating a user');
+    }
+});
+
+router.put('/:id', checkJwt, isAdmin, async(req, res) => {
     const userId = req.params.id;
+    console.log(`userId: ${userId}`)
+    console.log(req.body)
+    console.log(req.user)
     try {
         let existingUser = await Users.findOne(userId);
         if (!existingUser) throw new Error('RECORD_NOT_FOUND');

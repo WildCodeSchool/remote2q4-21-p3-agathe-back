@@ -72,7 +72,7 @@ const get_ingredients = (req) => {
     return ingredients.filter(item => item.name && item.description) // not empty
 }
 
-productsRouter.post('/', upload.single('picture'), (req, res) => {
+productsRouter.post('/', checkJwt, isAdmin, upload.single('picture'), (req, res) => {
     const {
         value,
         error
@@ -103,15 +103,6 @@ productsRouter.post('/', upload.single('picture'), (req, res) => {
     }
 });
 
-// productsRouter.post('/', upload.single('picture'), async (req, res) => {
-//     // const [{ insertId: id}] = await insertPost(req.body, req.file.path);
-//     return res.json({
-//         ...req.body,
-//         id,
-//         picture: req.file.filename
-//     });
-// });
-
 productsRouter.put('/:id', (req, res) => {
     let existingProducts = null;
     Products.findOne(req.params.id)
@@ -129,6 +120,17 @@ productsRouter.put('/:id', (req, res) => {
             } else return Products.update(req.params.id, value);
         })
         .then((value) => {
+            //remove ingredients
+            Ingredients.destroyForProduct(req.params.id)
+
+            //insert new ingredients
+            let ingredients = get_ingredients(req.body);
+            for (let ingredient of ingredients) {
+                Ingredients.create(rep.params.id,
+                    ingredient.name,
+                    ingredient.description)
+            }
+
             res.status(200).json({
                 ...existingProducts,
                 ...value

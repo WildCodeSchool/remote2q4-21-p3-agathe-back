@@ -32,7 +32,6 @@ const insertUser = (email, password, first_name, last_name, phone_number,
 const updateUser = ({
         id,
         email,
-        password,
         first_name,
         last_name,
         phone_number,
@@ -43,9 +42,9 @@ const updateUser = ({
         city
     }) =>
     db
-    .query('UPDATE users set (email=?, password=?, first_name=?, last_name=?, phone_number=?,\
-             address_1=?, address_2=?, address_3=?, post_code=?, city=?) \
-            WHERE id=?', [email, password, first_name, last_name, phone_number, address_1, address_2, address_3, post_code, city, id]);
+    .query('UPDATE users set email=?, first_name=?, last_name=?, phone_number=?,\
+             address_1=?, address_2=?, address_3=?, post_code=?, city=? \
+            WHERE id=?', [email, first_name, last_name, phone_number, address_1, address_2, address_3, post_code, city, id]);
 
 const authenticate = (email, password) =>
     db

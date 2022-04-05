@@ -33,10 +33,17 @@ const destroy = (id) => {
         .then(([result]) => result.affectedRows !== 0);
 };
 
+const destroyForProduct = (productId) => {
+    return db
+        .query('DELETE FROM ingredients WHERE product_id = ?', [productId])
+        .then(([result]) => result.affectedRows !== 0);
+};
+
 module.exports = {
     ingredientsForProduct,
     findOne,
     create,
     update,
-    destroy
+    destroy,
+    destroyForProduct
 };

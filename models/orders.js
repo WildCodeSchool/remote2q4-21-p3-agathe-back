@@ -4,11 +4,15 @@ const connection = require("../db-config");
 const db = connection.promise();
 
 const total = () =>
-    db.query('SELECT SUM(total_amount) AS total FROM orders')
+    db.query('SELECT coalesce(SUM(total_amount), 0) AS total\
+    FROM orders_header\
+    WHERE status_id IN (2, 3)')
     .then(([results]) => results[0]);
 
 const count = () =>
-    db.query('SELECT COUNT(*) AS count from orders')
+    db.query('SELECT COUNT(*) AS count\
+    FROM orders_header\
+    WHERE status_id IN (2, 3)')
     .then(([results]) => results[0]);
 
 const dailySales = () => {
@@ -34,8 +38,8 @@ const lastWeekSales = () => {
     let select = '\
     SELECT coalesce(SUM(o.total_amount),0) AS sales\
     FROM orders_header AS o \
-        JOIN calendar oc on oc.db_date=o.payment_date\
-        JOIN calendar AS c ON c.db_date=date_sub(curdate(), interval 1 WEEK) \
+    JOIN calendar oc on oc.db_date=o.payment_date\
+    JOIN calendar AS c ON c.db_date=date_sub(curdate(), interval 1 WEEK) \
     WHERE oc.year=c.year AND oc.week=c.week'
     return db
         .query(select)
@@ -56,10 +60,10 @@ const lastMonthSales = () => {
 
 const yearlySales = () =>
     db.query("SELECT c.year, c.month_name, coalesce(sum(o.total_amount),0) AS total_amount\
-    from calendar c\
-    left join orders_header o on o.creation_date=c.db_date\
-    where c.year=year(current_date)\
-    group by c.year, c.month_name")
+    FROM calendar c\
+    LEFT JOIN orders_header o ON o.payment_date=c.db_date\
+    WHERE c.year=year(current_date)\
+    GROUP BY c.year, c.month_name")
     .then(([results]) => results);
 
 const findForProduct = (product) => {

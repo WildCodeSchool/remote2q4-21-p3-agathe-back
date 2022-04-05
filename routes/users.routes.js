@@ -27,11 +27,6 @@ router.get('/count', (req, res) =>
     })
 );
 
-router.get('/who_am_i', checkJwt, (req, res) => {
-    let { password, ...userData } = req.user // remove the password
-    return res.json(userData)
-});
-
 router.get('/:id', (req, res) =>
     Users.findOne(req.params.id)
     .then(user => {
@@ -66,7 +61,6 @@ const userSchema = Joi.object({
 })
 
 router.post('/', async(req, res) => {
-    // recup donnees requete
     const {
         value,
         error
@@ -74,7 +68,6 @@ router.post('/', async(req, res) => {
     if (error) {
         return res.status(400).json(error);
     }
-    console.log('validated !')
 
     // verifie si user existe
     // await permet d'etre sur d'avoir un retour de verif user
@@ -87,17 +80,21 @@ router.post('/', async(req, res) => {
         })
     }
 
-    // etape de l'encryptage
     const hashedPassword = await argon2.hash(value.password);
 
-    await Users.insertUser(value.email, hashedPassword, value.first_name, value.last_name,
+    let user = await Users.insertUser(value.email, hashedPassword, value.first_name, value.last_name,
         value.phone_number, value.address_1, value.address_2, value.address_3,
         value.post_code, value.city);
 
-    const jwtKey = generateJWT(value.email, 'ROLE_USER');
-    return res.json({
-        credentials: jwtKey
-    })
+    value.id = user[0].insertId
+    value.is_admin = false
+    const token = generateJWT(value.email, value.is_admin);
+    let date = new Date();
+    let oneHour = 60 * 60; // expires in 1 hour
+    res.cookie("user_token", token, { maxAge: oneHour * 1000, httpOnly: true }); //, secure: true }); HTTPS ONLY
+    let { password, ...userData } = value // remove the password
+
+    return res.json(userData)
 })
 
 router.put('/:id', async(req, res) => {

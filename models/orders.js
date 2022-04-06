@@ -4,7 +4,7 @@ const connection = require("../db-config");
 const db = connection.promise();
 
 const total = () =>
-    db.query('SELECT coalesce(SUM(total_amount), 0) AS total\
+    db.query('SELECT coalesce(SUM(total_amount) + 0E0, 0)  AS total\
     FROM orders_header\
     WHERE status_id IN (2, 3)')
     .then(([results]) => results[0]);

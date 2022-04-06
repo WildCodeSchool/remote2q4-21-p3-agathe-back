@@ -144,8 +144,8 @@ productsRouter.put('/:id', (req, res) => {
         });
 });
 
-productsRouter.delete('/:id', (req, res) => {
-    Products.destroy(req.params.id)
+productsRouter.delete('/:id', checkJwt, isAdmin, (req, res) => {
+    Products.update(req.params.id, { active: false })
         .then((deleted) => {
             if (deleted) res.status(200).send('Product deleted!');
             else res.status(404).send('Product not found');

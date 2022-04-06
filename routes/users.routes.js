@@ -27,16 +27,18 @@ router.get('/count', (req, res) =>
     })
 );
 
-router.get('/:id', (req, res) =>
-    Users.findOne(req.params.id)
-    .then(user => {
-        if (user) res.json(user);
-        else res.status(404).send('User not found');
-    })
-    .catch(err => {
-        res.status(500).send('Error retrieving user from database');
-    })
-);
+router.get('/:id', checkJwt, (req, res) => {
+    if (!req.user.is_admin && req.user.id !== req.params.id)
+        return res.status(403).send('User not authorized');
+    return Users.findOne(req.params.id)
+        .then(user => {
+            if (user) res.json(user);
+            else res.status(404).send('User not found');
+        })
+        .catch(err => {
+            res.status(500).send('Error retrieving user from database');
+        })
+});
 
 router.get('/:id/orders', checkJwt, (req, res) => {
     let UserId;

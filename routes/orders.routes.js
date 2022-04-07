@@ -23,14 +23,33 @@ router.get('/count', (req, res) =>
     })
 )
 
-router.get('/total', (req, res) =>
-    Orders.total()
+router.get('/daily_sales', (req, res) =>
+    Orders.dailySales()
+    .then(sales => res.json(sales))
+    .catch(err => {
+        console.log(err)
+        res.status(500).send('Erreur en recherchant le montant des commandes du jour')
+    })
+)
+
+
+router.get('/last_month_sales', (req, res) =>
+    Orders.lastMonthSales()
     .then(orders => res.json(orders))
     .catch(err => {
         console.log(err)
-        res.status(500).send('Erreur en recherchant le montant des ventes dans la base de données')
+        res.status(500).send('Erreur en recherchant le montant des commandes du mois dernier')
     })
-)
+);
+
+router.get('/last_week_sales', (req, res) =>
+    Orders.lastWeekSales()
+    .then(orders => res.json(orders))
+    .catch(err => {
+        console.log(err)
+        res.status(500).send('Erreur en recherchant le montant des commandes de la semaine dernière')
+    })
+);
 
 router.get('/pending_deliveries', (req, res) =>
     Orders.pendingDeliveries()
@@ -50,33 +69,14 @@ router.get('/pending_payment', (req, res) =>
     })
 )
 
-// Stats
-router.get('/daily_sales', (req, res) =>
-    Orders.dailySales()
-    .then(sales => res.json(sales))
+router.get('/total', (req, res) =>
+    Orders.total()
+    .then(orders => res.json(orders))
     .catch(err => {
         console.log(err)
-        res.status(500).send('Erreur en recherchant le montant des commandes du jour')
+        res.status(500).send('Erreur en recherchant le montant des ventes dans la base de données')
     })
 )
-
-router.get('/last_month_sales', (req, res) =>
-    Orders.lastMonthSales()
-    .then(orders => res.json(orders))
-    .catch(err => {
-        console.log(err)
-        res.status(500).send('Erreur en recherchant le montant des commandes du mois dernier')
-    })
-);
-
-router.get('/last_week_sales', (req, res) =>
-    Orders.lastWeekSales()
-    .then(orders => res.json(orders))
-    .catch(err => {
-        console.log(err)
-        res.status(500).send('Erreur en recherchant le montant des commandes de la semaine dernière')
-    })
-);
 
 router.get('/yesterday_sales', (req, res) =>
     Orders.yesterdaySales()
@@ -98,14 +98,13 @@ router.get('/yearly_sales', (req, res) =>
 
 // router.get('/:id', checkJwt, isAdmin, (req, res) =>
 router.get('/:id', async(req, res) => {
-    console.log(req.params.id)
     try {
         let order = await Orders.findOne(req.params.id)
-        if (order) return res.json(order[0])
+        if (order) return res.json(order)
         else return res.status(404).send('Order not found')
     } catch (err) {
         console.log(err)
-        return res.status(500).send('Error retrieving user from database');
+        return res.status(500).send('Error retrieving order from database');
     }
 });
 
@@ -143,5 +142,33 @@ router.post('/', checkJwt, (req, res) => {
             res.status(500).send('Erreur en recherchant le montant des commandes de la semaine dernière')
         })
 })
+
+router.put('/paid/:id', async(req, res) => {
+    try {
+        let order = await Orders.findOne(req.params.id)
+        if (order && order.status_id === 1) {
+            OrdersStatus.create({ order_id: req.params.id, state_id: 2, status_date: new Date() })
+            let order = Orders.update(req.params.id, { status_id: 2 })
+            return res.json({...order, status_id: 2 })
+        } else return res.status(403).send('Order can not be paid')
+    } catch (err) {
+        console.log(err)
+        return res.status(500).send('Error changing order status');
+    }
+});
+
+router.put('/shipped/:id', async(req, res) => {
+    try {
+        let order = await Orders.findOne(req.params.id)
+        if (order && order.status_id === 2) {
+            OrdersStatus.create({ order_id: req.params.id, state_id: 3, status_date: new Date() })
+            let order = Orders.update(req.params.id, { status_id: 3 })
+            return res.json({...order, status_id: 3 })
+        } else return res.status(403).send('Order can not be paid')
+    } catch (err) {
+        console.log(err)
+        return res.status(500).send('Error changing order status');
+    }
+});
 
 module.exports = router;

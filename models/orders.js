@@ -124,7 +124,8 @@ const findMany = () => {
 
 const findOne = async(id) => {
     let results = await db.query('SELECT * FROM orders_header WHERE id = ?', [id])
-    if (results) return results[0]
+    if (results) return results[0][0]
+    else return null
 };
 
 const pendingDeliveries = () => {
@@ -163,7 +164,7 @@ const create = ({ user_id, total_amount, status_id }) => {
 };
 
 const update = (id, newAttributes) => {
-    return db.query('UPDATE orders SET ? WHERE OrderID = ?', [newAttributes, id]);
+    return db.query('UPDATE orders SET ? WHERE id = ?', [newAttributes, id]);
 };
 
 // const destroy = (id) => {
@@ -185,6 +186,7 @@ module.exports = {
     pendingDeliveries,
     pendingPayment,
     total,
+    update,
     yesterdaySales,
     yearlySales,
     yearlySalesForProduct,

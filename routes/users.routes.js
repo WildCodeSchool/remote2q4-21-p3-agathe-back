@@ -49,6 +49,15 @@ router.get('/:id/orders', checkJwt, (req, res) => {
         .catch(err => res.status(500).send('Error retrieving orders for user from database'))
 });
 
+router.get('/:id/yearly_sales', (req, res) =>
+    Orders.yearlySalesForUser(req.params.id)
+    .then(orders => res.json(orders))
+    .catch(err => {
+        console.log(err)
+        res.status(500).send("Erreur en recherchant le montant des commandes sur l'année")
+    })
+);
+
 const userSchema = Joi.object({
     email: Joi.string().email().required(),
     password: Joi.string().required(),

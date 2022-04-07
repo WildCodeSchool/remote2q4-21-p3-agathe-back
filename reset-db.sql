@@ -164,12 +164,13 @@ SELECT o.id,
     p.id as product_id,
     concat(p.sku, "-", p.name) as product,
     l.quantity,
+    l.price,
     l.price * l.quantity as amount,
     s.status_date as order_date,
     sp.status_date as payment_date,
     se.status_date as expedition_date,
-     os.id as status_id, os.state,
-     p.picture
+    os.id as status_id, os.state,
+    p.picture
 FROM orders o
     JOIN orders_lines l on l.order_id=o.id
     JOIN products p on p.id=l.product_id

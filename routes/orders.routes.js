@@ -32,6 +32,15 @@ router.get('/daily_sales', (req, res) =>
     })
 )
 
+router.get('/detail/:id', (req, res) =>
+    Orders.findOneWithLines(req.params.id)
+    .then(lines => res.json(lines))
+    .catch(err => {
+        console.log(err)
+        res.status(500).send("Erreur en recherchant le détail d'une commande")
+    })
+)
+
 
 router.get('/last_month_sales', (req, res) =>
     Orders.lastMonthSales()

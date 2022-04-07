@@ -128,6 +128,12 @@ const findOne = async(id) => {
     else return null
 };
 
+const findOneWithLines = async(id) => {
+    let results = await db.query('SELECT * FROM orders_detail WHERE id = ?', [id])
+    if (results) return results[0]
+    else return null
+};
+
 const pendingDeliveries = () => {
     let select = '\
     select id, product_id, product, user_id, user_name,\
@@ -181,6 +187,7 @@ module.exports = {
     findForUser,
     findMany,
     findOne,
+    findOneWithLines,
     lastMonthSales,
     lastWeekSales,
     pendingDeliveries,

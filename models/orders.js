@@ -66,6 +66,18 @@ const yearlySales = () =>
     GROUP BY c.year, c.month_name")
     .then(([results]) => results);
 
+const yearlySalesForProduct = (id) => {
+    let select = "\
+    SELECT c.year, c.month_name, coalesce(sum(o.amount),0) AS total_amount\
+    FROM calendar c\
+        LEFT JOIN orders_detail o ON o.payment_date=c.db_date and o.product_id=?\
+    WHERE c.year=year(current_date)\
+    GROUP BY c.year, c.month_name"
+    return db
+        .query(select, [id])
+        .then(([results]) => results);
+}
+
 const findForProduct = (product) => {
     let select = '\
     select id, product_id, product, user_id, user_name,\
@@ -149,7 +161,8 @@ module.exports = {
     pendingDeliveries,
     total,
     yesterdaySales,
-    yearlySales
+    yearlySales,
+    yearlySalesForProduct
     // findOne,
     // update,
     // destroy

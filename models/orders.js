@@ -122,11 +122,10 @@ const findMany = () => {
         .then(([results]) => results);
 }
 
-// const findOne = (id) => {
-//     return db
-//         .query('SELECT * FROM ingredients WHERE ingredientID = ?', [id])
-//         .then(([results]) => results[0]);
-// };
+const findOne = async(id) => {
+    let results = await db.query('SELECT * FROM orders_header WHERE id = ?', [id])
+    if (results) return results[0]
+};
 
 const pendingDeliveries = () => {
     let select = '\
@@ -134,6 +133,18 @@ const pendingDeliveries = () => {
         quantity, amount, order_date, state, picture\
     from orders_detail\
     where status_id=2\
+    order by id'
+    return db
+        .query(select)
+        .then(([results]) => results);
+}
+
+const pendingPayment = () => {
+    let select = '\
+    select id, product_id, product, user_id, user_name,\
+        quantity, amount, order_date, state, picture\
+    from orders_detail\
+    where status_id=1\
     order by id'
     return db
         .query(select)
@@ -168,15 +179,16 @@ module.exports = {
     findForProduct,
     findForUser,
     findMany,
+    findOne,
     lastMonthSales,
     lastWeekSales,
     pendingDeliveries,
+    pendingPayment,
     total,
     yesterdaySales,
     yearlySales,
     yearlySalesForProduct,
     yearlySalesForUser,
-    // findOne,
     // update,
     // destroy
 };

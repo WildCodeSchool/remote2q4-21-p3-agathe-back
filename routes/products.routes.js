@@ -49,6 +49,15 @@ productsRouter.get('/:id/orders', checkJwt, isAdmin, (req, res) => {
         .catch(err => res.status(500).send('Error retrieving orders for user from database'))
 });
 
+productsRouter.get('/:id/yearly_sales', (req, res) =>
+    Orders.yearlySalesForProduct(req.params.id)
+    .then(orders => res.json(orders))
+    .catch(err => {
+        console.log(err)
+        res.status(500).send("Erreur en recherchant le montant des commandes sur l'année")
+    })
+);
+
 productsRouter.get('/count', (req, res) =>
     Products.count()
     .then(products => res.json(products))

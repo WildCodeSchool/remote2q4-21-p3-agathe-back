@@ -15,7 +15,7 @@ const findMany = () =>
 
 const findOne = (id) =>
     db
-    .query('SELECT id, email, first_name, last_name, phone_number, address_1, address_2, address_3, post_code, city FROM users WHERE id=?', [id])
+    .query('SELECT id, email, first_name, last_name, phone_number, address_1, address_2, address_3, post_code, city, is_admin FROM users WHERE id=?', [id])
     .then(([results]) => results[0]);
 
 const findUserByEmail = (email) =>

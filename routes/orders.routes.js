@@ -41,6 +41,15 @@ router.get('/pending_deliveries', (req, res) =>
     })
 )
 
+router.get('/pending_payment', (req, res) =>
+    Orders.pendingPayment()
+    .then(orders => res.json(orders))
+    .catch(err => {
+        console.log(err)
+        res.status(500).send('Erreur en recherchant les commandes en attente de paiement')
+    })
+)
+
 // Stats
 router.get('/daily_sales', (req, res) =>
     Orders.dailySales()
@@ -87,16 +96,18 @@ router.get('/yearly_sales', (req, res) =>
     })
 );
 
-// router.get('/:id', (req, res) =>
-//     Users.findOne(req.params.id)
-//     .then(user => {
-//         if (user.length) res.json(results[0]);
-//         else res.status(404).send('User not found');
-//     })
-//     .catch(err => {
-//         res.status(500).send('Error retrieving user from database');
-//     })
-// );
+// router.get('/:id', checkJwt, isAdmin, (req, res) =>
+router.get('/:id', async(req, res) => {
+    console.log(req.params.id)
+    try {
+        let order = await Orders.findOne(req.params.id)
+        if (order) return res.json(order[0])
+        else return res.status(404).send('Order not found')
+    } catch (err) {
+        console.log(err)
+        return res.status(500).send('Error retrieving user from database');
+    }
+});
 
 router.post('/', checkJwt, (req, res) => {
     // recup donnees requete

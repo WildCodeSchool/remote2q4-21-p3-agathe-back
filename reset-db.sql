@@ -144,7 +144,7 @@ ON users(last_name);
 
 CREATE VIEW orders_header as
 SELECT o.id, o.total_amount,
-    u.id as user_id, u.last_name, u.email,
+    u.id as user_id, u.first_name, u.last_name, concat(u.first_name, ' ', u.last_name) as user_name, u.email,
     sc.status_date as creation_date,
     sp.status_date as payment_date,
     se.status_date as expedition_date,

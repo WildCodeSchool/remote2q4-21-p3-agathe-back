@@ -1,6 +1,5 @@
 const connection = require('./db-config');
 const express = require('express');
-const bodyParser = require('body-parser')
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
 const app = express();
@@ -19,7 +18,7 @@ connection.connect((err) => {
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(bodyParser.json())
+
 
 const corsOptions = {
     origin: process.env.CLIENT_URL,

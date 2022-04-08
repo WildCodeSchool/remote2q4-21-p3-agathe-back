@@ -68,7 +68,6 @@ router.get('/count', (req, res) =>
 )
 
 const validateData = (req, res, next) => {
-    console.log('req.body', req.body)
     try {
         const { value, error } = Products.validate(req.body);
         if (error) {
@@ -120,9 +119,9 @@ router.post('/', checkJwt, isAdmin, upload.single('picture'), validateData, (req
         });
 });
 
-router.put('/', checkJwt, isAdmin, validateData, async(req, res) => {
+router.put('/:id', checkJwt, isAdmin, validateData, async(req, res) => {
     try {
-        let id = req.data.id
+        let id = req.params.id
         let existingProduct = await Products.findOne(id)
         if (!existingProduct)
             return res.status(404).send(`Product with id ${id} not found.`);

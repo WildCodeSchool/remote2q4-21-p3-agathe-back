@@ -134,9 +134,6 @@ router.put('/', checkJwt, async(req, res) => {
 
 router.put('/:id', checkJwt, isAdmin, async(req, res) => {
     const userId = req.params.id;
-    console.log(`userId: ${userId}`)
-    console.log(req.body)
-    console.log(req.user)
     try {
         let existingUser = await Users.findOne(userId);
         if (!existingUser) throw new Error('RECORD_NOT_FOUND');

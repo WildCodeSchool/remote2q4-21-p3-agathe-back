@@ -194,12 +194,7 @@ VALUES (1, "HUILE BIO DEMAQUILLANTE", 17, "HDEM21", "Contenance : 50 mL\nDurée 
 
 INSERT INTO users(id, first_name, last_name, phone_number, password, email, is_admin, address_1, post_code, city)
 VALUES ( 1, 'admin', '', '0123456789', '$argon2i$v=19$m=4096,t=3,p=1$wkqEhPhX1FZ9ZHdLinesLw$G5UATWBEKq++UpMHK2CnvNYnnbCANu06mVzGv7dX/94', 'admin@example.com', true, '', 0 ,''),
- ( 2, 'test', '', '0123456789', '$argon2i$v=19$m=4096,t=3,p=1$wkqEhPhX1FZ9ZHdLinesLw$G5UATWBEKq++UpMHK2CnvNYnnbCANu06mVzGv7dX/94', 'test@example.com', false, '', 0 ,''),
- ( 3, 'Jean', 'Dupont', '0123456789', '$argon2i$v=19$m=4096,t=3,p=1$wkqEhPhX1FZ9ZHdLinesLw$G5UATWBEKq++UpMHK2CnvNYnnbCANu06mVzGv7dX/94', 'jean.dupont@example.com', false, '', 0 ,''),
- ( 4, 'Pierre', 'Martin', '0123456789', '$argon2i$v=19$m=4096,t=3,p=1$wkqEhPhX1FZ9ZHdLinesLw$G5UATWBEKq++UpMHK2CnvNYnnbCANu06mVzGv7dX/94', 'pierre.martin@example.com', false, '', 0 ,''),
- ( 5, 'Franck', 'Thomas', '0123456789', '$argon2i$v=19$m=4096,t=3,p=1$wkqEhPhX1FZ9ZHdLinesLw$G5UATWBEKq++UpMHK2CnvNYnnbCANu06mVzGv7dX/94', 'franck.thomas@example.com', false, '', 0 ,''),
- ( 6, 'Peter', 'Parker', '0123456789', '$argon2i$v=19$m=4096,t=3,p=1$wkqEhPhX1FZ9ZHdLinesLw$G5UATWBEKq++UpMHK2CnvNYnnbCANu06mVzGv7dX/94', 'peter.parker@buggle.com', false, '', 0 ,'')
- ;
+;
 
 -- Insert ingrédients
 INSERT INTO ingredients(product_id, name, description) VALUES
@@ -227,7 +222,46 @@ INSERT INTO states(id, state) VALUES
 (3, 'Envoyé')
 ;
 
-INSERT INTO orders_status(order_id, state_id, status_date) VALUES
+DELIMITER //
+SET lc_time_names = 'fr_FR';
+CREATE PROCEDURE fill_calendar(IN startdate DATE,IN stopdate DATE)
+BEGIN
+    DECLARE currentdate DATE;
+    SET currentdate = startdate;
+    WHILE currentdate < stopdate DO
+        INSERT INTO calendar VALUES (
+                        YEAR(currentdate)*10000+MONTH(currentdate)*100 + DAY(currentdate), currentdate,
+                        YEAR(currentdate),
+                        MONTH(currentdate),
+                        DAY(currentdate),
+                        QUARTER(currentdate),
+                        WEEKOFYEAR(currentdate),
+                        DATE_FORMAT(currentdate,'%W'),
+                        DATE_FORMAT(currentdate,'%M'),
+                        CASE DAYOFWEEK(currentdate) WHEN 1 THEN 't' WHEN 7 then 't' ELSE 'f' END);
+        SET currentdate = ADDDATE(currentdate,INTERVAL 1 DAY);
+    END WHILE;
+END
+//
+DELIMITER ;
+
+TRUNCATE TABLE calendar;
+
+CALL fill_calendar('2022-01-01','2032-01-01');
+
+-- ------------------------------------------------------------
+-- Fake Data
+-- ------------------------------------------------------------
+INSERT INTO users(id, first_name, last_name, phone_number, password, email, is_admin, address_1, post_code, city)
+VALUES 
+ ( 2, 'test', '', '0123456789', '$argon2i$v=19$m=4096,t=3,p=1$wkqEhPhX1FZ9ZHdLinesLw$G5UATWBEKq++UpMHK2CnvNYnnbCANu06mVzGv7dX/94', 'test@example.com', false, '', 0 ,''),
+ ( 3, 'Jean', 'Dupont', '0123456789', '$argon2i$v=19$m=4096,t=3,p=1$wkqEhPhX1FZ9ZHdLinesLw$G5UATWBEKq++UpMHK2CnvNYnnbCANu06mVzGv7dX/94', 'jean.dupont@example.com', false, '', 0 ,''),
+ ( 4, 'Pierre', 'Martin', '0123456789', '$argon2i$v=19$m=4096,t=3,p=1$wkqEhPhX1FZ9ZHdLinesLw$G5UATWBEKq++UpMHK2CnvNYnnbCANu06mVzGv7dX/94', 'pierre.martin@example.com', false, '', 0 ,''),
+ ( 5, 'Franck', 'Thomas', '0123456789', '$argon2i$v=19$m=4096,t=3,p=1$wkqEhPhX1FZ9ZHdLinesLw$G5UATWBEKq++UpMHK2CnvNYnnbCANu06mVzGv7dX/94', 'franck.thomas@example.com', false, '', 0 ,''),
+ ( 6, 'Peter', 'Parker', '0123456789', '$argon2i$v=19$m=4096,t=3,p=1$wkqEhPhX1FZ9ZHdLinesLw$G5UATWBEKq++UpMHK2CnvNYnnbCANu06mVzGv7dX/94', 'peter.parker@buggle.com', false, '', 0 ,'')
+ ;
+
+ INSERT INTO orders_status(order_id, state_id, status_date) VALUES
 (1, 1, '20220220'),
 (1, 2, '20220220'),
 (1, 3, '20220220'),
@@ -265,30 +299,3 @@ INSERT INTO orders_lines(order_id, product_id, quantity, price) VALUES
 (6, 1, 1,  17),
 (7, 2, 1,  21)
 ;
-
-DELIMITER //
-SET lc_time_names = 'fr_FR';
-CREATE PROCEDURE fill_calendar(IN startdate DATE,IN stopdate DATE)
-BEGIN
-    DECLARE currentdate DATE;
-    SET currentdate = startdate;
-    WHILE currentdate < stopdate DO
-        INSERT INTO calendar VALUES (
-                        YEAR(currentdate)*10000+MONTH(currentdate)*100 + DAY(currentdate), currentdate,
-                        YEAR(currentdate),
-                        MONTH(currentdate),
-                        DAY(currentdate),
-                        QUARTER(currentdate),
-                        WEEKOFYEAR(currentdate),
-                        DATE_FORMAT(currentdate,'%W'),
-                        DATE_FORMAT(currentdate,'%M'),
-                        CASE DAYOFWEEK(currentdate) WHEN 1 THEN 't' WHEN 7 then 't' ELSE 'f' END);
-        SET currentdate = ADDDATE(currentdate,INTERVAL 1 DAY);
-    END WHILE;
-END
-//
-DELIMITER ;
-
-TRUNCATE TABLE calendar;
-
-CALL fill_calendar('2022-01-01','2032-01-01');

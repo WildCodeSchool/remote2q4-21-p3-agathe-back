@@ -118,12 +118,6 @@ router.get('/:id', async(req, res) => {
 });
 
 router.post('/', checkJwt, (req, res) => {
-    // recup donnees requete
-    // const { value, error } = userSchema.validate(req.body);
-    // if (error) {
-    //     console.log(error)
-    //     return res.status(400).json(error);
-    // }
     const user_id = req.user.id
     const total_amount = req.body.reduce(
         (total, cartItem) => total + cartItem.quantity * cartItem.price,

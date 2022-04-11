@@ -1,10 +1,7 @@
 const authRouter = require("express").Router();
 const cookieParser = require('cookie-parser');
-const jwt = require('jsonwebtoken');
 const { generateJWT, decodeJWT } = require('../utils/auth')
-    //const { User, RefreshToken } = require('./models');
 const User = require('../models/users');
-// const config = require('./config');
 
 authRouter.post('/login', async(req, res, next) => {
     try {
@@ -99,7 +96,6 @@ authRouter.get('/admin', async(req, res) => {
             res.status(403).json({ message: '' }) // Forbidden
         }
     } catch (err) {
-        console.log('error')
         console.log(err)
     }
 });

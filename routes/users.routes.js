@@ -156,19 +156,4 @@ router.put('/:id', checkJwt, isAdmin, async(req, res) => {
     }
 });
 
-// router.delete('/:id', (req, res) => {
-//     connection.query(
-//         'DELETE FROM users WHERE id = ?', [req.params.id],
-//         (err, result) => {
-//             if (err) {
-//                 console.log(err);
-//                 res.status(500).send('Error deleting an user');
-//             } else {
-//                 if (result.affectedRows) res.status(200).send('🎉 User deleted!');
-//                 else res.status(404).send('User not found.');
-//             }
-//         }
-//     );
-// });
-
 module.exports = router;

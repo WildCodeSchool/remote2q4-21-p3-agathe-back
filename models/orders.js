@@ -1,5 +1,4 @@
 const connection = require("../db-config");
-// const Joi = require('joi');
 
 const db = connection.promise();
 
@@ -159,11 +158,9 @@ const pendingPayment = () => {
 }
 
 const create = ({ user_id, total_amount, status_id }) => {
-    // console.log(`Orders.create(${user_id}, ${total_amount}, ${status_id})`)
     return db
         .query("INSERT INTO orders(user_id, total_amount, status_id) VALUES (?, ?, ?)", [user_id, total_amount, status_id])
         .then(([results]) => {
-            // console.log(results)
             const id = results.insertId;
             return { id, user_id, total_amount, status_id };
         });
@@ -172,12 +169,6 @@ const create = ({ user_id, total_amount, status_id }) => {
 const update = (id, newAttributes) => {
     return db.query('UPDATE orders SET ? WHERE id = ?', [newAttributes, id]);
 };
-
-// const destroy = (id) => {
-//     return db
-//         .query('DELETE FROM ingredients WHERE id = ?', [id])
-//         .then(([result]) => result.affectedRows !== 0);
-// };
 
 module.exports = {
     count,
@@ -198,6 +189,4 @@ module.exports = {
     yearlySales,
     yearlySalesForProduct,
     yearlySalesForUser,
-    // update,
-    // destroy
 };

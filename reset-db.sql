@@ -8,26 +8,17 @@
 
 SET NAMES utf8;
 
-ALTER TABLE orders DROP FOREIGN KEY fk_Order_UserID; -- to delete
-ALTER TABLE orders DROP FOREIGN KEY fk_orders_UserID; -- to delete
 ALTER TABLE orders DROP FOREIGN KEY fk_orders_user_id;
-ALTER TABLE orders DROP FOREIGN KEY fk_order_OrderStatusID; -- to delete
 ALTER TABLE orders DROP FOREIGN KEY fk_orders_status_id;
-ALTER TABLE OrderLine DROP FOREIGN KEY fk_orderLine_OrderID; -- to delete
 ALTER TABLE orders_lines DROP FOREIGN KEY fk_orders_lines_order_id;
-ALTER TABLE OrderLine DROP FOREIGN KEY fk_orderLine_ProductID; -- to delete
 ALTER TABLE orders_lines DROP FOREIGN KEY fk_orders_lines_product_id;
-ALTER TABLE ingredients DROP FOREIGN KEY fk_Ingredients_ProductID; -- to delete
 ALTER TABLE ingredients DROP FOREIGN KEY fk_ingredients_product_id;
 
 DROP VIEW IF EXISTS orders_detail;
 DROP VIEW IF EXISTS orders_header;
 DROP TABLE IF EXISTS orders;
-DROP TABLE IF EXISTS OrderLine; -- to delete
 DROP TABLE IF EXISTS orders_lines;
-DROP TABLE IF EXISTS OrderStates; -- to delete
 DROP TABLE IF EXISTS states;
-DROP TABLE IF EXISTS OrderStatus; -- to delete
 DROP TABLE IF EXISTS orders_status;
 DROP TABLE IF EXISTS presentation;
 DROP TABLE IF EXISTS products;
@@ -193,7 +184,7 @@ VALUES (1, "HUILE BIO DEMAQUILLANTE", 17, "HDEM21", "Contenance : 50 mL\nDurée 
 (4, "HUILE SECHE CORPS & CHEVEUX BIO", 20, "HCOCH21", "Contenance : 50 mL\nDurée d'utilisation : 2 mois environ (40 utilisations)", "L’huile sèche corps et cheveux est enrichie en Chondrus Crispus (goëmon blanc). Elle vous apportera une nutrition intense de la peau ou des cheveux tout en laissant un toucher doux et doyeux accompagné d'une délicate odeur de vanille", "CHONDRUS CRISPUS EXTRACT and CAMELINA SATIVA SEED OIL, PARFUM, TOCOPHEROL, HELIANTHUS ANUUS OIL", 'a4192cfc1b16f87b3b5b15858614ed823');
 
 INSERT INTO users(id, first_name, last_name, phone_number, password, email, is_admin, address_1, post_code, city)
-VALUES ( 1, 'admin', '', '0123456789', '$argon2i$v=19$m=4096,t=3,p=1$wkqEhPhX1FZ9ZHdLinesLw$G5UATWBEKq++UpMHK2CnvNYnnbCANu06mVzGv7dX/94', 'admin@example.com', true, '', 0 ,''),
+VALUES ( 1, 'admin', '', '0123456789', '$argon2i$v=19$m=4096,t=3,p=1$wkqEhPhX1FZ9ZHdLinesLw$G5UATWBEKq++UpMHK2CnvNYnnbCANu06mVzGv7dX/94', 'admin@example.com', true, '', 0 ,'')
 ;
 
 -- Insert ingrédients

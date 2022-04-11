@@ -1,11 +1,3 @@
--- Exported from QuickDBD: https://www.quickdatabasediagrams.com/
--- Link to schema: https://app.quickdatabasediagrams.com/#/d/XqAiOD
--- NOTE! If you have used non-SQL datatypes in your design, you will have to change these here.
-
--- Modify this code to update the DB schema diagram.
--- To reset the sample schema, replace everything with
--- two dots ('..' - without quotes).
-
 SET NAMES utf8;
 
 ALTER TABLE orders DROP FOREIGN KEY fk_orders_user_id;
@@ -60,7 +52,7 @@ CREATE TABLE presentation (
 );
 
 CREATE TABLE products (
-    id int  NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    id int NOT NULL AUTO_INCREMENT PRIMARY KEY,
     name varchar(200) NOT NULL,
     price decimal(5,2) NOT NULL,
     sku varchar(13) NOT NULL DEFAULT '',
@@ -83,7 +75,7 @@ CREATE TABLE Ingredients (
 );
 
 CREATE TABLE users (
-    id int  NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    id int NOT NULL PRIMARY KEY AUTO_INCREMENT,
     is_admin bool  NOT NULL default false,
     password varchar(255) NOT NULL,
     email varchar(55) NOT NULL,
@@ -98,7 +90,7 @@ CREATE TABLE users (
 );
 
 CREATE TABLE calendar (
-    id           INTEGER PRIMARY KEY,  -- year*10000+month*100+day
+    id           INTEGER NOT NULL null PRIMARY KEY,  -- year*10000+month*100+day
     db_date      DATE NOT NULL,
     year         INTEGER NOT NULL,
     month        INTEGER NOT NULL, -- 1 to 12

@@ -28,7 +28,29 @@ git clone https://github.com/WildCodeSchool/remote2q4-21-p3-agathe-back
 
 npm install
 
-3️ Set up .env with indications .env.sample = parameters necessary for the application to work.
+  "dependencies": {  
+    "argon2": "^0.28.4",  
+    "axios": "^0.26.0",  
+    "cookie-parser": "^1.4.6",  
+    "cors": "^2.8.5",  
+    "dotenv": "^10.0.0",  
+    "express": "^4.17.1",  
+    "joi": "^17.6.0",  
+    "jsonwebtoken": "^8.5.1",  
+    "multer": "^1.4.4",  
+    "mysql2": "^2.3.0",  
+    "nodemon": "^2.0.15"  
+  }  
+
+3️ Set up .env with indications .env.sample = parameters necessary for the application to work.  
+PORT=8000  
+DB_HOST=localhost  
+DB_PORT=3306  
+DB_USER=root  
+DB_PASSWORD=root  
+DB_NAME=elfenn  
+JWT_SECRET=secret_key  
+CLIENT_URL=http://localhost:3000  
 
 4️ Lancement
 

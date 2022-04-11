@@ -8,10 +8,13 @@ This application is the back-end for the elfenn site.
 * JSON Web Token
 
 ### Getting started
-Node.js : https://nodejs.org/en/download/
+Node.js : https://nodejs.org/en/download/  
 MySQL : https://dev.mysql.com/downloads/mysql/
 
-Database : reset-db.sql It contains some fake data at the end of file
+Database : reset-db.sql
+It creates an admin user with 'test' password. NEED TO CHANGE THIS  
+It contains some fake data at the end of file
+
 
   ↳ CREATE DATABASE elfenn
 

@@ -258,7 +258,14 @@ VALUES
 (6, 1, '20220331'),
 (6, 2, '20220331'),
 (7, 1, '20220401'),
-(7, 2, '20220401')
+(7, 2, '20220401'),
+(8, 1, '20220406'),
+(8, 2, '20220406'),
+(9, 1, '20220411'),
+(9, 2, '20220411'),
+(10, 1, '20220412'),
+(10, 2, '20220412')
+;
 ;
 
 INSERT INTO orders(id, user_id, total_amount, status_id) VALUES
@@ -268,7 +275,10 @@ INSERT INTO orders(id, user_id, total_amount, status_id) VALUES
 (4, 3,  20, 2),
 (5, 5,  41, 2),
 (6, 6,  17, 2),
-(7, 6,  21, 2)
+(7, 6,  21, 2),
+(8, 4,  34, 2),
+(9, 5,  68, 2),
+(10, 4,  20, 2)
 ;
 
 INSERT INTO orders_lines(order_id, product_id, quantity, price) VALUES
@@ -280,5 +290,8 @@ INSERT INTO orders_lines(order_id, product_id, quantity, price) VALUES
 (5, 2, 1,  21),
 (5, 4, 1,  20),
 (6, 1, 1,  17),
-(7, 2, 1,  21)
+(7, 2, 1,  21),
+(8, 3, 1,  34),
+(9, 3, 2,  34),
+(10, 4, 1,  20)
 ;

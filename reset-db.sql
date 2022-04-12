@@ -90,7 +90,7 @@ CREATE TABLE users (
 );
 
 CREATE TABLE calendar (
-    id           INTEGER NOT NULL null PRIMARY KEY,  -- year*10000+month*100+day
+    id           INTEGER NOT NULL PRIMARY KEY,  -- year*10000+month*100+day
     db_date      DATE NOT NULL,
     year         INTEGER NOT NULL,
     month        INTEGER NOT NULL, -- 1 to 12
@@ -265,7 +265,6 @@ VALUES
 (9, 2, '20220411'),
 (10, 1, '20220412'),
 (10, 2, '20220412')
-;
 ;
 
 INSERT INTO orders(id, user_id, total_amount, status_id) VALUES

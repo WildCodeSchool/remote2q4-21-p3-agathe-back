@@ -1,5 +1,3 @@
-SET NAMES utf8;
-
 ALTER TABLE orders DROP FOREIGN KEY fk_orders_user_id;
 ALTER TABLE orders DROP FOREIGN KEY fk_orders_status_id;
 ALTER TABLE orders_lines DROP FOREIGN KEY fk_orders_lines_order_id;
@@ -18,6 +16,9 @@ DROP TABLE IF EXISTS ingredients;
 DROP TABLE IF EXISTS users;
 DROP TABLE IF EXISTS calendar;
 DROP PROCEDURE IF EXISTS fill_calendar;
+
+
+SET NAMES utf8;
 
 CREATE TABLE orders (
     id int NOT NULL PRIMARY KEY AUTO_INCREMENT,
@@ -67,7 +68,7 @@ CREATE TABLE products (
     )
 );
 
-CREATE TABLE Ingredients (
+CREATE TABLE ingredients (
     id int NOT NULL AUTO_INCREMENT PRIMARY KEY,
     name varchar(255) NOT NULL,
     description text NOT NULL,
@@ -165,7 +166,7 @@ FROM orders o
 ;
 
 -- PRESENTATION
-INSERT INTO Presentation(presentation)
+INSERT INTO presentation(presentation)
 VALUES ("Elfenn a été imaginée en Bretagne sud, à la croisée des éléments naturels.\nElle est née de l'intérêt de Pierre pour les huiles végétales et de la volonté de sa fille, Agathe, de vous faire découvrir la caméline et ses innombrables vertus au travers de soins adaptés pour tous.\n\nNos huiles y sont fabriquées artisanalement pour sublimer tous leurs bienfaits.\nLeur composition est à 100% d'origine naturelle, les ingrédients à 98% d'origine bretonne et les flacons sont en verre, zéro-déchet.");
 
 -- insert des 4 articles de base
@@ -206,9 +207,9 @@ INSERT INTO states(id, state) VALUES
 ;
 
 DELIMITER //
-SET lc_time_names = 'fr_FR';
 CREATE PROCEDURE fill_calendar(IN startdate DATE,IN stopdate DATE)
 BEGIN
+SET lc_time_names = 'fr_FR';
     DECLARE currentdate DATE;
     SET currentdate = startdate;
     WHILE currentdate < stopdate DO

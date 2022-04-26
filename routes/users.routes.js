@@ -1,6 +1,6 @@
 const router = require("express").Router();
 const Joi = require('joi');
-const argon2 = require('argon2');
+// const argon2 = require('argon2');
 const {
     generateJWT
 } = require('../utils/auth');
@@ -91,9 +91,9 @@ router.post('/', async(req, res) => {
         })
     }
 
-    const hashedPassword = await argon2.hash(value.password);
+    // const hashedPassword = await argon2.hash(value.password);
 
-    let user = await Users.insertUser(value.email, hashedPassword, value.first_name, value.last_name,
+    let user = await Users.insertUser(value.email, value.password, value.first_name, value.last_name,
         value.phone_number, value.address_1, value.address_2, value.address_3,
         value.post_code, value.city);
 

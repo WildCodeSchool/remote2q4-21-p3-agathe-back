@@ -50,20 +50,20 @@ const authenticate = (email, password) =>
     db
     .query('SELECT id, first_name, last_name, email, is_admin FROM users WHERE email=? and password=?', [email, password]);
 
-const hashingOptions = {
-    type: argon2.argon2id,
-    memoryCost: 2 ** 16,
-    timeCost: 5,
-    parallelism: 1,
-};
+// const hashingOptions = {
+//     type: argon2.argon2id,
+//     memoryCost: 2 ** 16,
+//     timeCost: 5,
+//     parallelism: 1,
+// };
 
-const hashPassword = (plainPassword) => {
-    return argon2.hash(plainPassword, hashingOptions);
-};
+// const hashPassword = (plainPassword) => {
+//     return argon2.hash(plainPassword, hashingOptions);
+// };
 
-const verifyPassword = (plainPassword, hashedPassword) => {
-    return argon2.verify(hashedPassword, plainPassword, hashingOptions);
-};
+// const verifyPassword = (plainPassword, hashedPassword) => {
+//     return argon2.verify(hashedPassword, plainPassword, hashingOptions);
+// };
 
 module.exports = {
     count,
@@ -73,6 +73,6 @@ module.exports = {
     insertUser,
     updateUser,
     authenticate,
-    hashPassword,
-    verifyPassword,
+    // hashPassword,
+    // verifyPassword,
 };

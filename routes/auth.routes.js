@@ -1,10 +1,7 @@
 const authRouter = require("express").Router();
 const cookieParser = require('cookie-parser');
-const jwt = require('jsonwebtoken');
 const { generateJWT, decodeJWT } = require('../utils/auth')
-    //const { User, RefreshToken } = require('./models');
 const User = require('../models/users');
-// const config = require('./config');
 
 authRouter.post('/login', async(req, res, next) => {
     try {
@@ -36,8 +33,9 @@ authRouter.post('/login', async(req, res, next) => {
                                 let oneHour = 60 * 60; // expires in 1 hour
                                 // res.cookie("user_token", token, { expiresIn: oneHour, httpOnly: true }); //, secure: true }); HTTPS ONLY
                                 res.cookie("user_token", token, { maxAge: oneHour * 1000, httpOnly: true }); //, secure: true }); HTTPS ONLY
-                                res.send();
-                                // res.json({ credentials: token });
+                                let { password, ...userData } = user // remove the password
+                                return res.json(userData)
+                                    // res.json({ credentials: token });
                             } else res.status(401).send('Invalid credentials');
                         })
                 }
@@ -98,7 +96,6 @@ authRouter.get('/admin', async(req, res) => {
             res.status(403).json({ message: '' }) // Forbidden
         }
     } catch (err) {
-        console.log('error')
         console.log(err)
     }
 });

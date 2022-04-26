@@ -6,15 +6,12 @@ require('dotenv').config();
 const checkJwt = async(req, res, next) => {
     try {
         const { cookies } = req;
-
         // Check if the JWT is present in the request's cookies
         if (!cookies || !cookies.user_token) {
             return res.status(401).json({ message: 'Missing token in cookie' });
         }
-
         // Check and decode the token
         const decodedToken = jwt.verify(cookies.user_token, process.env.JWT_SECRET);
-
         // Check if user exists
         const { email } = decodedToken;
         const [
@@ -25,10 +22,8 @@ const checkJwt = async(req, res, next) => {
                 message: `User ${email} not exists`
             });
         }
-
         // Pass the user in the request to access it in other middleware
         req.user = user;
-
         return next(); // call next middleware
     } catch (err) {
         console.log(err)

@@ -1,33 +1,16 @@
--- Exported from QuickDBD: https://www.quickdatabasediagrams.com/
--- Link to schema: https://app.quickdatabasediagrams.com/#/d/XqAiOD
--- NOTE! If you have used non-SQL datatypes in your design, you will have to change these here.
-
--- Modify this code to update the DB schema diagram.
--- To reset the sample schema, replace everything with
--- two dots ('..' - without quotes).
-
 SET NAMES utf8;
 
-ALTER TABLE orders DROP FOREIGN KEY fk_Order_UserID; -- to delete
-ALTER TABLE orders DROP FOREIGN KEY fk_orders_UserID; -- to delete
 ALTER TABLE orders DROP FOREIGN KEY fk_orders_user_id;
-ALTER TABLE orders DROP FOREIGN KEY fk_order_OrderStatusID; -- to delete
 ALTER TABLE orders DROP FOREIGN KEY fk_orders_status_id;
-ALTER TABLE OrderLine DROP FOREIGN KEY fk_orderLine_OrderID; -- to delete
 ALTER TABLE orders_lines DROP FOREIGN KEY fk_orders_lines_order_id;
-ALTER TABLE OrderLine DROP FOREIGN KEY fk_orderLine_ProductID; -- to delete
 ALTER TABLE orders_lines DROP FOREIGN KEY fk_orders_lines_product_id;
-ALTER TABLE ingredients DROP FOREIGN KEY fk_Ingredients_ProductID; -- to delete
 ALTER TABLE ingredients DROP FOREIGN KEY fk_ingredients_product_id;
 
 DROP VIEW IF EXISTS orders_detail;
 DROP VIEW IF EXISTS orders_header;
 DROP TABLE IF EXISTS orders;
-DROP TABLE IF EXISTS OrderLine; -- to delete
 DROP TABLE IF EXISTS orders_lines;
-DROP TABLE IF EXISTS OrderStates; -- to delete
 DROP TABLE IF EXISTS states;
-DROP TABLE IF EXISTS OrderStatus; -- to delete
 DROP TABLE IF EXISTS orders_status;
 DROP TABLE IF EXISTS presentation;
 DROP TABLE IF EXISTS products;
@@ -69,7 +52,7 @@ CREATE TABLE presentation (
 );
 
 CREATE TABLE products (
-    id int  NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    id int NOT NULL AUTO_INCREMENT PRIMARY KEY,
     name varchar(200) NOT NULL,
     price decimal(5,2) NOT NULL,
     sku varchar(13) NOT NULL DEFAULT '',
@@ -77,6 +60,7 @@ CREATE TABLE products (
     description text NOT NULL,
     ingredients_details text NOT NULL,
     picture varchar(50),
+    active boolean default true,
 
     CONSTRAINT `uc_products_name` UNIQUE (
         `name`
@@ -91,7 +75,7 @@ CREATE TABLE Ingredients (
 );
 
 CREATE TABLE users (
-    id int  NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    id int NOT NULL PRIMARY KEY AUTO_INCREMENT,
     is_admin bool  NOT NULL default false,
     password varchar(255) NOT NULL,
     email varchar(55) NOT NULL,
@@ -106,7 +90,7 @@ CREATE TABLE users (
 );
 
 CREATE TABLE calendar (
-    id           INTEGER PRIMARY KEY,  -- year*10000+month*100+day
+    id           INTEGER NOT NULL PRIMARY KEY,  -- year*10000+month*100+day
     db_date      DATE NOT NULL,
     year         INTEGER NOT NULL,
     month        INTEGER NOT NULL, -- 1 to 12
@@ -143,7 +127,7 @@ ON users(last_name);
 
 CREATE VIEW orders_header as
 SELECT o.id, o.total_amount,
-    u.id as user_id, u.last_name, u.email,
+    u.id as user_id, u.first_name, u.last_name, concat(u.first_name, ' ', u.last_name) as user_name, u.email,
     sc.status_date as creation_date,
     sp.status_date as payment_date,
     se.status_date as expedition_date,
@@ -163,12 +147,13 @@ SELECT o.id,
     p.id as product_id,
     concat(p.sku, "-", p.name) as product,
     l.quantity,
+    l.price,
     l.price * l.quantity as amount,
     s.status_date as order_date,
     sp.status_date as payment_date,
     se.status_date as expedition_date,
-     os.id as status_id, os.state,
-     p.picture
+    os.id as status_id, os.state,
+    p.picture
 FROM orders o
     JOIN orders_lines l on l.order_id=o.id
     JOIN products p on p.id=l.product_id
@@ -191,13 +176,8 @@ VALUES (1, "HUILE BIO DEMAQUILLANTE", 17, "HDEM21", "Contenance : 50 mL\nDurée 
 (4, "HUILE SECHE CORPS & CHEVEUX BIO", 20, "HCOCH21", "Contenance : 50 mL\nDurée d'utilisation : 2 mois environ (40 utilisations)", "L’huile sèche corps et cheveux est enrichie en Chondrus Crispus (goëmon blanc). Elle vous apportera une nutrition intense de la peau ou des cheveux tout en laissant un toucher doux et doyeux accompagné d'une délicate odeur de vanille", "CHONDRUS CRISPUS EXTRACT and CAMELINA SATIVA SEED OIL, PARFUM, TOCOPHEROL, HELIANTHUS ANUUS OIL", 'a4192cfc1b16f87b3b5b15858614ed823');
 
 INSERT INTO users(id, first_name, last_name, phone_number, password, email, is_admin, address_1, post_code, city)
-VALUES ( 1, 'admin', '', '0123456789', '$argon2i$v=19$m=4096,t=3,p=1$wkqEhPhX1FZ9ZHdLinesLw$G5UATWBEKq++UpMHK2CnvNYnnbCANu06mVzGv7dX/94', 'admin@example.com', true, '', 0 ,''),
- ( 2, 'test', '', '0123456789', '$argon2i$v=19$m=4096,t=3,p=1$wkqEhPhX1FZ9ZHdLinesLw$G5UATWBEKq++UpMHK2CnvNYnnbCANu06mVzGv7dX/94', 'test@example.com', false, '', 0 ,''),
- ( 3, 'Jean', 'Dupont', '0123456789', '$argon2i$v=19$m=4096,t=3,p=1$wkqEhPhX1FZ9ZHdLinesLw$G5UATWBEKq++UpMHK2CnvNYnnbCANu06mVzGv7dX/94', 'jean.dupont@example.com', false, '', 0 ,''),
- ( 4, 'Pierre', 'Martin', '0123456789', '$argon2i$v=19$m=4096,t=3,p=1$wkqEhPhX1FZ9ZHdLinesLw$G5UATWBEKq++UpMHK2CnvNYnnbCANu06mVzGv7dX/94', 'pierre.martin@example.com', false, '', 0 ,''),
- ( 5, 'Franck', 'Thomas', '0123456789', '$argon2i$v=19$m=4096,t=3,p=1$wkqEhPhX1FZ9ZHdLinesLw$G5UATWBEKq++UpMHK2CnvNYnnbCANu06mVzGv7dX/94', 'franck.thomas@example.com', false, '', 0 ,''),
- ( 6, 'Peter', 'Parker', '0123456789', '$argon2i$v=19$m=4096,t=3,p=1$wkqEhPhX1FZ9ZHdLinesLw$G5UATWBEKq++UpMHK2CnvNYnnbCANu06mVzGv7dX/94', 'peter.parker@buggle.com', false, '', 0 ,'')
- ;
+VALUES ( 1, 'admin', '', '0123456789', '$argon2i$v=19$m=4096,t=3,p=1$wkqEhPhX1FZ9ZHdLinesLw$G5UATWBEKq++UpMHK2CnvNYnnbCANu06mVzGv7dX/94', 'admin@example.com', true, '', 0 ,'')
+;
 
 -- Insert ingrédients
 INSERT INTO ingredients(product_id, name, description) VALUES
@@ -223,45 +203,6 @@ INSERT INTO states(id, state) VALUES
 (1, 'En attente'),
 (2, 'Payé'),
 (3, 'Envoyé')
-;
-
-INSERT INTO orders_status(order_id, state_id, status_date) VALUES
-(1, 1, '20220220'),
-(1, 2, '20220220'),
-(1, 3, '20220220'),
-(2, 1, '20220316'),
-(2, 2, '20220317'),
-(3, 1, '20220317'),
-(4, 1, '20220318'),
-(4, 2, '20220324'),
-(5, 1, '20220324'),
-(5, 2, '20220330'),
-(6, 1, '20220331'),
-(6, 2, '20220331'),
-(7, 1, '20220401'),
-(7, 2, '20220401')
-;
-
-INSERT INTO orders(id, user_id, total_amount, status_id) VALUES
-(1, 3,  17, 3),
-(2, 4,  68, 2),
-(3, 5, 100, 1),
-(4, 3,  20, 2),
-(5, 5,  41, 2),
-(6, 6,  17, 2),
-(7, 6,  21, 2)
-;
-
-INSERT INTO orders_lines(order_id, product_id, quantity, price) VALUES
-(1, 1, 1,  17),
-(2, 3, 1,  34),
-(2, 1, 2,  17), 
-(3, 4, 5,  20),
-(4, 4, 1,  20),
-(5, 2, 1,  21),
-(5, 4, 1,  20),
-(6, 1, 1,  17),
-(7, 2, 1,  21)
 ;
 
 DELIMITER //
@@ -290,3 +231,66 @@ DELIMITER ;
 TRUNCATE TABLE calendar;
 
 CALL fill_calendar('2022-01-01','2032-01-01');
+
+-- ------------------------------------------------------------
+-- Fake Data
+-- ------------------------------------------------------------
+INSERT INTO users(id, first_name, last_name, phone_number, password, email, is_admin, address_1, post_code, city)
+VALUES 
+ ( 2, 'test', '', '0123456789', '$argon2i$v=19$m=4096,t=3,p=1$wkqEhPhX1FZ9ZHdLinesLw$G5UATWBEKq++UpMHK2CnvNYnnbCANu06mVzGv7dX/94', 'test@example.com', false, '', 0 ,''),
+ ( 3, 'Jean', 'Dupont', '0123456789', '$argon2i$v=19$m=4096,t=3,p=1$wkqEhPhX1FZ9ZHdLinesLw$G5UATWBEKq++UpMHK2CnvNYnnbCANu06mVzGv7dX/94', 'jean.dupont@example.com', false, '', 0 ,''),
+ ( 4, 'Pierre', 'Martin', '0123456789', '$argon2i$v=19$m=4096,t=3,p=1$wkqEhPhX1FZ9ZHdLinesLw$G5UATWBEKq++UpMHK2CnvNYnnbCANu06mVzGv7dX/94', 'pierre.martin@example.com', false, '', 0 ,''),
+ ( 5, 'Franck', 'Thomas', '0123456789', '$argon2i$v=19$m=4096,t=3,p=1$wkqEhPhX1FZ9ZHdLinesLw$G5UATWBEKq++UpMHK2CnvNYnnbCANu06mVzGv7dX/94', 'franck.thomas@example.com', false, '', 0 ,''),
+ ( 6, 'Peter', 'Parker', '0123456789', '$argon2i$v=19$m=4096,t=3,p=1$wkqEhPhX1FZ9ZHdLinesLw$G5UATWBEKq++UpMHK2CnvNYnnbCANu06mVzGv7dX/94', 'peter.parker@buggle.com', false, '', 0 ,'')
+ ;
+
+ INSERT INTO orders_status(order_id, state_id, status_date) VALUES
+(1, 1, '20220220'),
+(1, 2, '20220220'),
+(1, 3, '20220220'),
+(2, 1, '20220316'),
+(2, 2, '20220317'),
+(3, 1, '20220317'),
+(4, 1, '20220318'),
+(4, 2, '20220324'),
+(5, 1, '20220324'),
+(5, 2, '20220330'),
+(6, 1, '20220331'),
+(6, 2, '20220331'),
+(7, 1, '20220401'),
+(7, 2, '20220401'),
+(8, 1, '20220406'),
+(8, 2, '20220406'),
+(9, 1, '20220411'),
+(9, 2, '20220411'),
+(10, 1, '20220412'),
+(10, 2, '20220412')
+;
+
+INSERT INTO orders(id, user_id, total_amount, status_id) VALUES
+(1, 3,  17, 3),
+(2, 4,  68, 2),
+(3, 5, 100, 1),
+(4, 3,  20, 2),
+(5, 5,  41, 2),
+(6, 6,  17, 2),
+(7, 6,  21, 2),
+(8, 4,  34, 2),
+(9, 5,  68, 2),
+(10, 4,  20, 2)
+;
+
+INSERT INTO orders_lines(order_id, product_id, quantity, price) VALUES
+(1, 1, 1,  17),
+(2, 3, 1,  34),
+(2, 1, 2,  17), 
+(3, 4, 5,  20),
+(4, 4, 1,  20),
+(5, 2, 1,  21),
+(5, 4, 1,  20),
+(6, 1, 1,  17),
+(7, 2, 1,  21),
+(8, 3, 1,  34),
+(9, 3, 2,  34),
+(10, 4, 1,  20)
+;

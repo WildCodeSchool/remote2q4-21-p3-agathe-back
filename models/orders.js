@@ -1,14 +1,17 @@
 const connection = require("../db-config");
-// const Joi = require('joi');
 
 const db = connection.promise();
 
 const total = () =>
-    db.query('SELECT SUM(total_amount) AS total FROM orders')
+    db.query('SELECT coalesce(SUM(total_amount), 0)  AS total\
+    FROM orders_header\
+    WHERE status_id IN (2, 3)')
     .then(([results]) => results[0]);
 
 const count = () =>
-    db.query('SELECT COUNT(*) AS count from orders')
+    db.query('SELECT COUNT(*) AS count\
+    FROM orders_header\
+    WHERE status_id IN (2, 3)')
     .then(([results]) => results[0]);
 
 const dailySales = () => {
@@ -34,8 +37,8 @@ const lastWeekSales = () => {
     let select = '\
     SELECT coalesce(SUM(o.total_amount),0) AS sales\
     FROM orders_header AS o \
-        JOIN calendar oc on oc.db_date=o.payment_date\
-        JOIN calendar AS c ON c.db_date=date_sub(curdate(), interval 1 WEEK) \
+    JOIN calendar oc on oc.db_date=o.payment_date\
+    JOIN calendar AS c ON c.db_date=date_sub(curdate(), interval 1 WEEK) \
     WHERE oc.year=c.year AND oc.week=c.week'
     return db
         .query(select)
@@ -56,11 +59,35 @@ const lastMonthSales = () => {
 
 const yearlySales = () =>
     db.query("SELECT c.year, c.month_name, coalesce(sum(o.total_amount),0) AS total_amount\
-    from calendar c\
-    left join orders_header o on o.creation_date=c.db_date\
-    where c.year=year(current_date)\
-    group by c.year, c.month_name")
+    FROM calendar c\
+    LEFT JOIN orders_header o ON o.payment_date=c.db_date\
+    WHERE c.year=year(current_date)\
+    GROUP BY c.year, c.month_name")
     .then(([results]) => results);
+
+const yearlySalesForProduct = (id) => {
+    let select = "\
+    SELECT c.year, c.month_name, coalesce(sum(o.amount),0) AS total_amount\
+    FROM calendar c\
+        LEFT JOIN orders_detail o ON o.payment_date=c.db_date and o.product_id=?\
+    WHERE c.year=year(current_date)\
+    GROUP BY c.year, c.month_name"
+    return db
+        .query(select, [id])
+        .then(([results]) => results);
+}
+
+const yearlySalesForUser = (id) => {
+    let select = "\
+    SELECT c.year, c.month_name, coalesce(sum(o.amount),0) AS total_amount\
+    FROM calendar c\
+        LEFT JOIN orders_detail o ON o.payment_date=c.db_date and o.user_id=?\
+    WHERE c.year=year(current_date)\
+    GROUP BY c.year, c.month_name"
+    return db
+        .query(select, [id])
+        .then(([results]) => results);
+}
 
 const findForProduct = (product) => {
     let select = '\
@@ -94,11 +121,17 @@ const findMany = () => {
         .then(([results]) => results);
 }
 
-// const findOne = (id) => {
-//     return db
-//         .query('SELECT * FROM ingredients WHERE ingredientID = ?', [id])
-//         .then(([results]) => results[0]);
-// };
+const findOne = async(id) => {
+    let results = await db.query('SELECT * FROM orders_header WHERE id = ?', [id])
+    if (results) return results[0][0]
+    else return null
+};
+
+const findOneWithLines = async(id) => {
+    let results = await db.query('SELECT * FROM orders_detail WHERE id = ?', [id])
+    if (results) return results[0]
+    else return null
+};
 
 const pendingDeliveries = () => {
     let select = '\
@@ -112,26 +145,30 @@ const pendingDeliveries = () => {
         .then(([results]) => results);
 }
 
+const pendingPayment = () => {
+    let select = '\
+    select id, product_id, product, user_id, user_name,\
+        quantity, amount, order_date, state, picture\
+    from orders_detail\
+    where status_id=1\
+    order by id'
+    return db
+        .query(select)
+        .then(([results]) => results);
+}
+
 const create = ({ user_id, total_amount, status_id }) => {
-    // console.log(`Orders.create(${user_id}, ${total_amount}, ${status_id})`)
     return db
         .query("INSERT INTO orders(user_id, total_amount, status_id) VALUES (?, ?, ?)", [user_id, total_amount, status_id])
         .then(([results]) => {
-            // console.log(results)
             const id = results.insertId;
             return { id, user_id, total_amount, status_id };
         });
 };
 
 const update = (id, newAttributes) => {
-    return db.query('UPDATE orders SET ? WHERE OrderID = ?', [newAttributes, id]);
+    return db.query('UPDATE orders SET ? WHERE id = ?', [newAttributes, id]);
 };
-
-// const destroy = (id) => {
-//     return db
-//         .query('DELETE FROM ingredients WHERE id = ?', [id])
-//         .then(([result]) => result.affectedRows !== 0);
-// };
 
 module.exports = {
     count,
@@ -140,13 +177,16 @@ module.exports = {
     findForProduct,
     findForUser,
     findMany,
+    findOne,
+    findOneWithLines,
     lastMonthSales,
     lastWeekSales,
     pendingDeliveries,
+    pendingPayment,
     total,
+    update,
     yesterdaySales,
-    yearlySales
-    // findOne,
-    // update,
-    // destroy
+    yearlySales,
+    yearlySalesForProduct,
+    yearlySalesForUser,
 };

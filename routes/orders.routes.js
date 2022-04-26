@@ -23,25 +23,6 @@ router.get('/count', (req, res) =>
     })
 )
 
-router.get('/total', (req, res) =>
-    Orders.total()
-    .then(orders => res.json(orders))
-    .catch(err => {
-        console.log(err)
-        res.status(500).send('Erreur en recherchant le montant des ventes dans la base de données')
-    })
-)
-
-router.get('/pending_deliveries', (req, res) =>
-    Orders.pendingDeliveries()
-    .then(orders => res.json(orders))
-    .catch(err => {
-        console.log(err)
-        res.status(500).send('Erreur en recherchant les commandes en attente de livraison')
-    })
-)
-
-// Stats
 router.get('/daily_sales', (req, res) =>
     Orders.dailySales()
     .then(sales => res.json(sales))
@@ -50,6 +31,16 @@ router.get('/daily_sales', (req, res) =>
         res.status(500).send('Erreur en recherchant le montant des commandes du jour')
     })
 )
+
+router.get('/detail/:id', (req, res) =>
+    Orders.findOneWithLines(req.params.id)
+    .then(lines => res.json(lines))
+    .catch(err => {
+        console.log(err)
+        res.status(500).send("Erreur en recherchant le détail d'une commande")
+    })
+)
+
 
 router.get('/last_month_sales', (req, res) =>
     Orders.lastMonthSales()
@@ -69,6 +60,33 @@ router.get('/last_week_sales', (req, res) =>
     })
 );
 
+router.get('/pending_deliveries', (req, res) =>
+    Orders.pendingDeliveries()
+    .then(orders => res.json(orders))
+    .catch(err => {
+        console.log(err)
+        res.status(500).send('Erreur en recherchant les commandes en attente de livraison')
+    })
+)
+
+router.get('/pending_payment', (req, res) =>
+    Orders.pendingPayment()
+    .then(orders => res.json(orders))
+    .catch(err => {
+        console.log(err)
+        res.status(500).send('Erreur en recherchant les commandes en attente de paiement')
+    })
+)
+
+router.get('/total', (req, res) =>
+    Orders.total()
+    .then(orders => res.json(orders))
+    .catch(err => {
+        console.log(err)
+        res.status(500).send('Erreur en recherchant le montant des ventes dans la base de données')
+    })
+)
+
 router.get('/yesterday_sales', (req, res) =>
     Orders.yesterdaySales()
     .then(orders => res.json(orders))
@@ -87,37 +105,19 @@ router.get('/yearly_sales', (req, res) =>
     })
 );
 
-// router.get('/:id', (req, res) =>
-//     Users.findOne(req.params.id)
-//     .then(user => {
-//         if (user.length) res.json(results[0]);
-//         else res.status(404).send('User not found');
-//     })
-//     .catch(err => {
-//         res.status(500).send('Error retrieving user from database');
-//     })
-// );
-
-// const userSchema = Joi.object({
-//     email: Joi.string().email().required(),
-//     password: Joi.string().required(),
-//     FirstName: Joi.string().required(),
-//     LastName: Joi.string().required(),
-//     PhoneNumber: Joi.string().required(),
-//     Address1: Joi.string().required(),
-//     Address2: Joi.string().allow(null, ''),
-//     Address3: Joi.string().allow(null, ''),
-//     postCode: Joi.string().required(),
-//     city: Joi.string().required()
-// })
+// router.get('/:id', checkJwt, isAdmin, (req, res) =>
+router.get('/:id', async(req, res) => {
+    try {
+        let order = await Orders.findOne(req.params.id)
+        if (order) return res.json(order)
+        else return res.status(404).send('Order not found')
+    } catch (err) {
+        console.log(err)
+        return res.status(500).send('Error retrieving order from database');
+    }
+});
 
 router.post('/', checkJwt, (req, res) => {
-    // recup donnees requete
-    // const { value, error } = userSchema.validate(req.body);
-    // if (error) {
-    //     console.log(error)
-    //     return res.status(400).json(error);
-    // }
     const user_id = req.user.id
     const total_amount = req.body.reduce(
         (total, cartItem) => total + cartItem.quantity * cartItem.price,
@@ -146,36 +146,32 @@ router.post('/', checkJwt, (req, res) => {
         })
 })
 
-// router.put('/:id', async(req, res) => {
-//     const userId = req.params.id;
-//     try {
-//         let existingUser = await Users.findOne(userId);
-//         if (!existingUser) throw new Error('RECORD_NOT_FOUND');
-//         // etape de l'encryptage
-//         const hashedPassword = await argon2.hash(req.body.password);
-//         await Users.updateUser({...req.body, id: userId, password: hashedPassword });
-//         res.status(200).json({...existingUser, ...req.body });
-//     } catch (error) {
-//         console.error(err);
-//         if (err === 'RECORD_NOT_FOUND')
-//             res.status(404).send(`User with id ${userId} not found.`);
-//         else res.status(500).send('Error updating a user');
-//     }
-// });
+router.put('/paid/:id', async(req, res) => {
+    try {
+        let order = await Orders.findOne(req.params.id)
+        if (order && order.status_id === 1) {
+            OrdersStatus.create({ order_id: req.params.id, state_id: 2, status_date: new Date() })
+            let order = Orders.update(req.params.id, { status_id: 2 })
+            return res.json({...order, status_id: 2 })
+        } else return res.status(403).send('Order can not be paid')
+    } catch (err) {
+        console.log(err)
+        return res.status(500).send('Error changing order status');
+    }
+});
 
-// router.delete('/:id', (req, res) => {
-//     connection.query(
-//         'DELETE FROM users WHERE id = ?', [req.params.id],
-//         (err, result) => {
-//             if (err) {
-//                 console.log(err);
-//                 res.status(500).send('Error deleting an user');
-//             } else {
-//                 if (result.affectedRows) res.status(200).send('🎉 User deleted!');
-//                 else res.status(404).send('User not found.');
-//             }
-//         }
-//     );
-// });
+router.put('/shipped/:id', async(req, res) => {
+    try {
+        let order = await Orders.findOne(req.params.id)
+        if (order && order.status_id === 2) {
+            OrdersStatus.create({ order_id: req.params.id, state_id: 3, status_date: new Date() })
+            let order = Orders.update(req.params.id, { status_id: 3 })
+            return res.json({...order, status_id: 3 })
+        } else return res.status(403).send('Order can not be paid')
+    } catch (err) {
+        console.log(err)
+        return res.status(500).send('Error changing order status');
+    }
+});
 
 module.exports = router;

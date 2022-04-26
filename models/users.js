@@ -15,7 +15,7 @@ const findMany = () =>
 
 const findOne = (id) =>
     db
-    .query('SELECT id, email, first_name, last_name, phone_number, address_1, address_2, address_3, post_code, city FROM users WHERE id=?', [id])
+    .query('SELECT id, email, first_name, last_name, phone_number, address_1, address_2, address_3, post_code, city, is_admin FROM users WHERE id=?', [id])
     .then(([results]) => results[0]);
 
 const findUserByEmail = (email) =>
@@ -32,7 +32,6 @@ const insertUser = (email, password, first_name, last_name, phone_number,
 const updateUser = ({
         id,
         email,
-        password,
         first_name,
         last_name,
         phone_number,
@@ -43,9 +42,9 @@ const updateUser = ({
         city
     }) =>
     db
-    .query('UPDATE users set (email=?, password=?, first_name=?, last_name=?, phone_number=?,\
-             address_1=?, address_2=?, address_3=?, post_code=?, city=?) \
-            WHERE id=?', [email, password, first_name, last_name, phone_number, address_1, address_2, address_3, post_code, city, id]);
+    .query('UPDATE users set email=?, first_name=?, last_name=?, phone_number=?,\
+             address_1=?, address_2=?, address_3=?, post_code=?, city=? \
+            WHERE id=?', [email, first_name, last_name, phone_number, address_1, address_2, address_3, post_code, city, id]);
 
 const authenticate = (email, password) =>
     db

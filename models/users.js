@@ -56,13 +56,16 @@ const authenticate = (email, password) =>
 //     parallelism: 1,
 // };
 
-// const hashPassword = (plainPassword) => {
-//     return argon2.hash(plainPassword, hashingOptions);
-// };
+const hashPassword = (plainPassword) => {
+    return (plainPassword);
+};
 
-// const verifyPassword = (plainPassword, hashedPassword) => {
-//     return argon2.verify(hashedPassword, plainPassword, hashingOptions);
-// };
+const verifyPassword = (plainPassword, hashedPassword) => {
+    if(plainPassword===hashedPassword)
+        return true;
+     else
+        return false; 
+};
 
 module.exports = {
     count,
@@ -72,6 +75,6 @@ module.exports = {
     insertUser,
     updateUser,
     authenticate,
-    // hashPassword,
-    // verifyPassword,
+    hashPassword,
+    verifyPassword,
 };

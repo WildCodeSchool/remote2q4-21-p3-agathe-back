@@ -22,8 +22,9 @@ authRouter.post('/login', async(req, res, next) => {
                 /* 5. On envoie une erreur au client si les informations de connexion sont erronées */
                 if (!user) res.status(401).send('Invalid credentials')
                 else {
-                    User.then(passwordIsCorrect => {
-                            if (passwordIsCorrect) {
+                    User.verifyPassword(password, user.password)
+                        {
+                            
                                 /* 6. On créer le JWT */
                                 // const token = calculateJWTToken(user);
                                 const token = generateJWT(user.email, user.is_admin);
@@ -35,8 +36,8 @@ authRouter.post('/login', async(req, res, next) => {
                                 let { password, ...userData } = user // remove the password
                                 return res.json(userData)
                                     // res.json({ credentials: token });
-                            } else res.status(401).send('Invalid credentials');
-                        })
+                            } 
+                        
                 }
             })
 

@@ -22,8 +22,7 @@ authRouter.post('/login', async(req, res, next) => {
                 /* 5. On envoie une erreur au client si les informations de connexion sont erronées */
                 if (!user) res.status(401).send('Invalid credentials')
                 else {
-                    User.verifyPassword(password, user.password)
-                        .then(passwordIsCorrect => {
+                    User.then(passwordIsCorrect => {
                             if (passwordIsCorrect) {
                                 /* 6. On créer le JWT */
                                 // const token = calculateJWTToken(user);

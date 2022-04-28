@@ -138,11 +138,11 @@ router.put('/:id', checkJwt, isAdmin, async(req, res) => {
         let existingUser = await Users.findOne(userId);
         if (!existingUser) throw new Error('RECORD_NOT_FOUND');
         // etape de l'encryptage
-        const hashedPassword = await argon2.hash(req.body.password);
+        // const hashedPassword = await argon2.hash(req.body.password);
         await Users.updateUser({
             ...req.body,
             id: userId,
-            password: hashedPassword
+            password: password
         });
         res.status(200).json({
             ...existingUser,
